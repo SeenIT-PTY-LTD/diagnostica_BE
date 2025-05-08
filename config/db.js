@@ -11,7 +11,7 @@
 
 const mongoose = require('mongoose');
 
-const connection = mongoose.createConnection('mongodb://localhost:27017/pain_management')
+const connection = mongoose.createConnection('mongodb+srv://Admin_Diag:DiagAdmin2025@diagnostica.bufpk3m.mongodb.net/test_pain_management')
     .on('open', () => {
         console.log("MongoDB Connected");
     })
@@ -20,3 +20,15 @@ const connection = mongoose.createConnection('mongodb://localhost:27017/pain_man
     });
 
 module.exports = connection;
+
+// const mongoose = require('mongoose');
+
+// const connection = mongoose.createConnection('mongodb://localhost:27017/pain_management')
+//     .on('open', () => {
+//         console.log("MongoDB Connected");
+//     })
+//     .on('error', (err) => {
+//         console.log("MongoDB Connection Error:", err);
+//     });
+
+// module.exports = connection;

@@ -84,6 +84,7 @@ router.get("/geteq", eqController.getEmail);
 router.delete("/deleteeq", eqController.delete);
 
 router.post("/data", diagnoController.create);
+router.put("/update-data", diagnoController.update);
 router.get("/getdatas", diagnoController.getData);
 router.delete("/deletedata", diagnoController.delete);
 

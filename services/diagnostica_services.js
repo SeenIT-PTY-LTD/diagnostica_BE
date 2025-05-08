@@ -10,6 +10,31 @@ class DiagnosticaServices {
         }
     }
 
+    // static async updateData(email, updateFields) {
+    //     try {
+    //         return await DiagnosticaModel.findOneAndUpdate(
+    //             {email: email},
+    //             {$set: updateFields},
+    //             {new: true} // Return the updated document
+    //         );
+    //     } catch(error) {
+    //         throw error;
+    //     }
+    // }
+
+    static async updateDataById(id, updateFields) {
+        try {
+          return await DiagnosticaModel.findByIdAndUpdate(
+            id,
+            { $set: updateFields },
+            { new: true }
+          );
+        } catch (error) {
+          throw error;
+        }
+      }
+    
+
     static async  getDataByEmail(email) {
         try {
           const detail = await DiagnosticaModel.find({ email: email });
