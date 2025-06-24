@@ -2,14 +2,34 @@ const ImageModel = require('../model/image_model');
 
 class ImageServices{
 
-  static async documents(email,img1,img2,img3,img4,img5,img6,date,time) {
+  // static async documents(email,img1,img2,img3,img4,img5,img6,date,time) {
+  //   try {
+  //     const newdocuments = new ImageModel({
+  //       email,img1,img2,img3,img4,img5,img6,date,time
+  //     });
+
+  //     return  await newdocuments.save()
+
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
+    static async documents(email, img1, img2, img3, img4, img5, img6, date, time) {
     try {
-      const newdocuments = new ImageModel({
-        email,img1,img2,img3,img4,img5,img6,date,time
+      const newDocument = new ImageModel({
+        email,
+        img1,
+        img2,
+        img3,
+        img4,
+        img5,
+        img6,
+        date,
+        time,
       });
 
-      return  await newdocuments.save()
-
+      return await newDocument.save();
     } catch (error) {
       throw error;
     }

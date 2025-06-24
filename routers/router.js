@@ -17,21 +17,37 @@ const otpController = require("../controller/otp_controller");
 const painrangecontroller = require("../controller/painrange_controller");
 const commentcontroller = require("../controller/Comment_controller");
 
-const storage = multer.diskStorage({
-    destination: './img',   
-    filename: (req, file, cb)=>{
-      cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
-    } 
-  })
+// const storage = multer.diskStorage({
+//   destination: './img',
+//   filename: (req, file, cb) => {
+//     cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+//   },
+// });
 
-  const upload = multer({ storage: storage }).fields([
-    { name: "img1", maxCount: 1 },
-    { name: "img2", maxCount: 1 },
-    { name: "img3", maxCount: 1 },
-    { name: "img4", maxCount: 1 },
-    { name: "img5", maxCount: 1 },
-    { name: "img6", maxCount: 1 },
-  ]);
+// const upload = multer({ storage }).fields([
+//   { name: "img1", maxCount: 1 },
+//   { name: "img2", maxCount: 1 },
+//   { name: "img3", maxCount: 1 },
+//   { name: "img4", maxCount: 1 },
+//   { name: "img5", maxCount: 1 },
+//   { name: "img6", maxCount: 1 },
+// ]);
+
+const storage = multer.diskStorage({
+  destination: './img',
+  filename: (req, file, cb) => {
+    cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+  },
+});
+
+const upload = multer({ storage }).fields([
+  { name: "img1", maxCount: 1 },
+  { name: "img2", maxCount: 1 },
+  { name: "img3", maxCount: 1 },
+  { name: "img4", maxCount: 1 },
+  { name: "img5", maxCount: 1 },
+  { name: "img6", maxCount: 1 },
+]);
 
 router.post("/idcode", idcodeController.idcode);
 
