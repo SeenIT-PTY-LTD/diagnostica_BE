@@ -33,6 +33,7 @@ const commentcontroller = require("../controller/Comment_controller");
 //   { name: "img6", maxCount: 1 },
 // ]);
 
+
 const storage = multer.diskStorage({
   destination: './img',
   filename: (req, file, cb) => {
