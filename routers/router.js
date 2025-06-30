@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { route } = require("../app");
-const multer = require('multer');
+const multer = require("multer");
 const path = require("path");
 
 const moxfqController = require("../controller/moxfq_controller");
@@ -16,6 +16,14 @@ const imageController = require("../controller/image_controller");
 const otpController = require("../controller/otp_controller");
 const painrangecontroller = require("../controller/painrange_controller");
 const commentcontroller = require("../controller/Comment_controller");
+const {
+  addElbowData,
+  getElbowData,
+} = require("../controller/elbow_controller");
+const {
+  addShouldersData,
+  getShouldersData,
+} = require("../controller/shoulders_controller");
 
 // const storage = multer.diskStorage({
 //   destination: './img',
@@ -33,11 +41,13 @@ const commentcontroller = require("../controller/Comment_controller");
 //   { name: "img6", maxCount: 1 },
 // ]);
 
-
 const storage = multer.diskStorage({
-  destination: './img',
+  destination: "./img",
   filename: (req, file, cb) => {
-    cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    cb(
+      null,
+      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
+    );
   },
 });
 
@@ -49,6 +59,8 @@ const upload = multer({ storage }).fields([
   { name: "img5", maxCount: 1 },
   { name: "img6", maxCount: 1 },
 ]);
+
+const bodyPartsUpload = multer({ storage });
 
 router.post("/idcode", idcodeController.idcode);
 
@@ -121,5 +133,12 @@ router.post("/comment", commentcontroller.create);
 router.put("/updatcomment", commentcontroller.Update);
 router.get("/getcomment", commentcontroller.getData);
 router.delete("/deletecomment", commentcontroller.delete);
+
+//body parts
+
+router.post("/elbow", bodyPartsUpload.array("images", 6), addElbowData);
+router.get("/elbow", getElbowData);
+router.post("/shoulders", bodyPartsUpload.array("images", 6), addShouldersData);
+router.get("/shoulders", getShouldersData);
 
 module.exports = router;
