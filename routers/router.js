@@ -16,14 +16,11 @@ const imageController = require("../controller/image_controller");
 const otpController = require("../controller/otp_controller");
 const painrangecontroller = require("../controller/painrange_controller");
 const commentcontroller = require("../controller/Comment_controller");
-const {
-  addElbowData,
-  getElbowData,
-} = require("../controller/elbow_controller");
-const {
-  addShouldersData,
-  getShouldersData,
-} = require("../controller/shoulders_controller");
+const elbowController = require("../controller/elbow_controller");
+const shoulderController = require("../controller/shoulders_controller");
+const wristController = require("../controller/wrist_controller");
+const hipController = require("../controller/hip_controller");
+const kneeController = require("../controller/knee_controller");
 
 // const storage = multer.diskStorage({
 //   destination: './img',
@@ -134,11 +131,27 @@ router.put("/updatcomment", commentcontroller.Update);
 router.get("/getcomment", commentcontroller.getData);
 router.delete("/deletecomment", commentcontroller.delete);
 
-//body parts
+/***  body parts  ****/
 
-router.post("/elbow", bodyPartsUpload.array("images", 6), addElbowData);
-router.get("/elbow", getElbowData);
-router.post("/shoulders", bodyPartsUpload.array("images", 6), addShouldersData);
-router.get("/shoulders", getShouldersData);
+router.post("/elbow", bodyPartsUpload.array("images", 6), elbowController.addElbowData);
+router.get("/elbow", elbowController.getElbowData);
+
+// shoulders
+router.post("/shoulders", bodyPartsUpload.array("images", 6), shoulderController.addShouldersData);
+router.get("/shoulders", shoulderController.getShouldersData);
+
+// wrist
+router.post("/wrist", bodyPartsUpload.array("images", 6), wristController.addWristData);
+router.get("/wrist", wristController.getWristData);
+
+// hip
+router.post("/hip", bodyPartsUpload.array("images", 6), hipController.addHipData);
+router.get("/hip", hipController.getHipData);
+
+// knee 
+router.post("/knee", bodyPartsUpload.array("images", 6), kneeController.addKneeData);
+router.get("/knee", kneeController.getKneeData);
+
+/*** end body parts */
 
 module.exports = router;

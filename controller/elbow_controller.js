@@ -3,23 +3,29 @@ const Elbow = require('../model/elbow_model');
 
 const addElbowData = async (req, res) => {
   try {
-    const images = (req.files || []).map((file) => file.filename);
+    let images 
+        
+    if( req.files){
+      images = (req.files || []).map((file) => file.filename);
+    }
+  
     const { email, pree, pasesE, ases, dash } = req.body;
 
-    if (!email || !pree || !pasesE || !ases || !dash) {
+    if (!email ) {
       return res.status(400).json({
-        message: "Email and all question sets (PREE, PASES-E, ASES, DASH) are required.",
+        message: "Email are required.",
       });
     }
 
-    const parsedData = {
-      email,
-      images,
-      pree: JSON.parse(pree),
-      pasesE: JSON.parse(pasesE),
-      ases: JSON.parse(ases),
-      dash: JSON.parse(dash),
+    let parsedData = {
+      email
     };
+
+    if( pree )  parsedData['pree'] = JSON.parse(pree);
+    if( images ) parsedData['images'] = images;
+    if( pasesE ) parsedData['pasesE'] = JSON.parse(pasesE);
+    if( ases ) parsedData['ases'] = JSON.parse(ases)
+    if( dash )  parsedData['dash'] = JSON.parse(dash)
 
     const result = await createElbowEntry(parsedData);
 

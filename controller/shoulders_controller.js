@@ -3,24 +3,30 @@ const Shoulders = require('../model/shoulders_model');
 
 const addShouldersData = async (req, res) => {
   try {
-    const images = (req.files || []).map((file) => file.filename);
+    let images 
+
+    if( req.files){
+      images = (req.files || []).map((file) => file.filename);
+    }
+   
     const { email, dash, spadi, sst, worc, asf } = req.body;
 
-    if (!email || !worc || !spadi || !sst || !worc || !asf) {
+    if (!email ) {
       return res.status(400).json({
-        message: "Email and all question sets (DASH, SPADI, SST, WORD, ASF, IMAGES) are required.",
+        message: "Email are required.",
       });
     }
 
-    const parsedData = {
-      email,
-      images,
-      dash: JSON.parse(dash),
-      spadi: JSON.parse(spadi),
-      sst: JSON.parse(sst),
-      worc: JSON.parse(worc),
-      asf: JSON.parse(asf),
+    let parsedData = {
+      email
     };
+
+    if( images ) parsedData['images'] = images;
+    if( dash ) parsedData['dash'] = JSON.parse(dash);
+    if( spadi ) parsedData['spadi'] = JSON.parse(spadi);
+    if( sst ) parsedData['sst'] = JSON.parse(sst);
+    if( worc ) parsedData['worc'] = JSON.parse(worc);
+    if( asf ) parsedData['asf'] = JSON.parse(asf)
 
     const result = await createShouldersEntry(parsedData);
 
