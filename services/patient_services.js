@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 class PatientServices{
-    static async registerPatient(fname,lname,dob,gender,email,phone,address,state,postcode,password,height,weight,bmi){
+    static async registerPatient(fname,lname,dob,gender,email,phone,address,state,postcode,password,height,weight,bmi,country,urn){
         try{
-            const createPatient = new PatientModel({fname,lname,dob,gender,email,phone,address,state,postcode,password,height,weight,bmi});
+            const createPatient = new PatientModel({fname,lname,dob,gender,email,phone,address,state,postcode,password,height,weight,bmi,country,urn});
             return await createPatient.save();
         }catch(err){
             throw err;

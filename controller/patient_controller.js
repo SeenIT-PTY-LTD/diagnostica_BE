@@ -2,10 +2,10 @@ const PatientServices = require("../services/patient_services")
 
 exports.register = async(req, res, next)=>{
     try{
-        const{fname,lname,dob,gender,email,phone,address,state,postcode,password,height,weight,bmi} = req.body;
+        const{fname,lname,dob,gender,email,phone,address,state,postcode,password,height,weight,bmi,country,urn} = req.body;
 
-        const successRes = await PatientServices.registerPatient(fname,lname,dob,gender,email,phone,address,state,postcode,password,height,weight,bmi);
-        let tokenData = {fname:fname, lname: lname, dob: dob, gender: gender, email: email, phone: phone, address: address, state: state, postcode: postcode ,height : height, weight : weight,bmi : bmi};
+        const successRes = await PatientServices.registerPatient(fname,lname,dob,gender,email,phone,address,state,postcode,password,height,weight,bmi,country,urn);
+        let tokenData = {fname:fname, lname: lname, dob: dob, gender: gender, email: email, phone: phone, address: address, state: state, postcode: postcode ,height : height, weight : weight,bmi : bmi,country:country,urn: urn};
         res.json({status: true, token: tokenData});
 
     }catch(error){
@@ -18,10 +18,9 @@ exports.login = async(req, res, next)=>{
         const{email,password} = req.body;
         const patient = await PatientServices.checkuser(email);
         if(!patient){
-            res.status(200).json({status:false, message: "User Not Found"})
+            res.status(200).json({status:false, message: "Invalid username or password"})
         }else{
        
-        console.log(patient);
         const isMatch = await patient.comparePassword(password);
 
         if(isMatch === false){
