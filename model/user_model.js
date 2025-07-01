@@ -57,6 +57,14 @@ const patientSchema = new Schema({
     bmi : {
         type: String,
        default:""
+    },
+    country : {
+        type: String,
+        default:""
+    },
+    urn : {
+        type: String,
+        default:""
     }
 
 });
