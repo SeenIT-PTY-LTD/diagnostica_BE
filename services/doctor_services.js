@@ -99,6 +99,14 @@ class DoctorServices {
             throw new Error('An error occurred while updating the doctor: ' + err.message);
         }
     };
+
+    static async getALlEnteriesBasedOnCondition( condition ) {
+        try {
+            return await DoctorModel.find( condition  , { _id : 1 , firstname : 1 , lastname : 1 } );
+        } catch (error) {
+            throw error
+        }
+    }
   
 }
 module.exports = DoctorServices;

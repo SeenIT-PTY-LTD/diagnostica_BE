@@ -21,6 +21,8 @@ const shoulderController = require("../controller/shoulders_controller");
 const wristController = require("../controller/wrist_controller");
 const hipController = require("../controller/hip_controller");
 const kneeController = require("../controller/knee_controller");
+const bodyPartController = require('../controller/body_parts_controller');
+const referralController = require('../controller/referral_controller')
 
 // const storage = multer.diskStorage({
 //   destination: './img',
@@ -79,7 +81,7 @@ router.get("/getdoctor1", doctorController.getAdmin);
 router.get("/getemail", doctorController.getEmail);
 router.put("/updatedoctor", doctorController.Update);
 router.delete("/deletedoctor", doctorController.delete);
-
+router.get("/get-doctors", doctorController.getAdmin)
 router.post("/moxfq", moxfqController.submitMoxfqAnswer);
 router.post("/fetmoxfq", moxfqController.fetmoxfq);
 router.put("/updatemoxfq", moxfqController.Update);
@@ -131,7 +133,10 @@ router.put("/updatcomment", commentcontroller.Update);
 router.get("/getcomment", commentcontroller.getData);
 router.delete("/deletecomment", commentcontroller.delete);
 
+
 /***  body parts  ****/
+// router.post("/body-part", bodyPartController.create);
+router.get("/body-part", bodyPartController.getEnteries);
 
 router.post("/elbow", bodyPartsUpload.array("images", 6), elbowController.addElbowData);
 router.get("/elbow", elbowController.getElbowData);
@@ -153,5 +158,8 @@ router.post("/knee", bodyPartsUpload.array("images", 6), kneeController.addKneeD
 router.get("/knee", kneeController.getKneeData);
 
 /*** end body parts */
+
+router.post('/referral', referralController.create );
+router.get('/referral', referralController.getEnteries)
 
 module.exports = router;

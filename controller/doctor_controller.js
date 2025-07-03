@@ -94,6 +94,14 @@ exports.getAdmin = async(req,res,next) =>{
         
     }
 }
+exports.getAllDoctors = async(req,res,next) =>{
+    try {
+        const Admin = await DoctorServices.getALlEnteriesBasedOnCondition({});
+        return res.status(200).json(Admin)
+    } catch (error) {
+        return res.status(500).json({message : error.message})
+    }
+}
 
 exports.getEmail = async(req,res,next) => {
     try {
