@@ -29,7 +29,7 @@ exports.create = async(req, res, next)=>{
                     Diagnostica
 
                 </p>`;
-
+                // cicd
                 const subject = 'Welcome message'
                 const to = req.body.email;
                 let send = await EmailService.sendEmail( to , subject, html);
