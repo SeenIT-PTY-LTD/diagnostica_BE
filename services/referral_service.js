@@ -6,7 +6,7 @@ class ReferralServices {
         try{
 
             const Data = new ReferralModel(data);
-            const result = Data.save();
+            const result = await Data.save();
 
             return { isSuccess : true ,statusCode : 200, result : result, message : "Entery Created Successfully"}
         }catch(err){
