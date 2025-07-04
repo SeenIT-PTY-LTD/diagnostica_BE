@@ -5,7 +5,7 @@ exports.create = async(req, res, next)=>{
     try{
     
         const response = await ReferralServices.createEntery( req.body );
-
+        
         if(response['isSuccess']){
 
             if( req.body['deliveryMethod']['email'] || req.body['deliveryMethod']['both'] ){
