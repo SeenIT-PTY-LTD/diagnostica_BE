@@ -39,7 +39,7 @@ db.once('open', () => {
 });
   
 // middleware
-// app.use(AuthMiddleware)
+app.use(AuthMiddleware)
 
 // regiter routes
 app.use(TestRoute);
