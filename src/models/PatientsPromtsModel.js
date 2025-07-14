@@ -22,11 +22,14 @@ var schema = new Schema({
     totalSections : {
         type : Number
     },
-    compltedSections : {
+    completedSections : {
         type : Number
+    },
+    appointmentId : {
+        type : String
     }
 },{ timestamps : true });
 
-const UserPromtsModel = new mongoose.model('userPromts', schema);
+const PatientPromtsModel = new mongoose.model('patientPromt', schema);
 
-module.exports = UserPromtsModel;
+module.exports = PatientPromtsModel;

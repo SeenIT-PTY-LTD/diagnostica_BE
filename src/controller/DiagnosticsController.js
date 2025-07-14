@@ -1,4 +1,4 @@
-const DiagnosticsModel = require("../models/DiagnosticsMode");
+const DiagnosticsModel = require("../models/DiagnosticsModel");
 const CommonCrud = require("../services/CommonCrud");
 const Response = require("../utils/Response");
 const { StatusCodes } = require("../utils/StatusCodes");

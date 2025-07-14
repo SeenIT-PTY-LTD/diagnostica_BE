@@ -15,7 +15,7 @@ const SectionRoute = require('./src/routes/SectionRoute.js')
 const SubSectionRoute = require('./src/routes/SubSectionRoute.js')
 const BodyPartRoute = require('./src/routes/BodyPartsRoute.js')
 const QuestionRoute = require('./src/routes/QuestionRoute.js')
-const UserPromtsRoute = require('./src/routes/UserPromtsRoute.js')
+const PatientsPromtsRoute = require('./src/routes/PatientPromtsRoute.js')
 const DiagnosticsRoute = require('./src/routes/DiagnosticsRoute.js')
 
 const path = require('path');
@@ -50,7 +50,7 @@ app.use('/section',SectionRoute)
 app.use('/sub-section',SubSectionRoute)
 app.use('/body-part', BodyPartRoute)
 app.use('/question', QuestionRoute)
-app.use('/promts',UserPromtsRoute)
+app.use('/promts',PatientsPromtsRoute)
 app.use('/diagnostics',DiagnosticsRoute)
 
 const PORT = config.express.port;

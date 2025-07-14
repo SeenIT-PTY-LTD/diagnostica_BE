@@ -18,7 +18,6 @@ async function CreateEntery( req ,res ){
 
     try {
 
-        console.log('====================create')
         const checkEmail = await UserCommanCrud.getEnteryBasedOnCondition({ email : req.body.email, isActive : true })
 
         if(checkEmail['isSuccess'] && checkEmail['result'].length){
