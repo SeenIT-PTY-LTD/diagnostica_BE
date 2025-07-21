@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
+const multer = require('multer');
 
 // internal modules
 const AuthMiddleware = require("./src/middleWears/AuthMiddleware.js");
@@ -17,9 +18,11 @@ const BodyPartRoute = require('./src/routes/BodyPartsRoute.js')
 const QuestionRoute = require('./src/routes/QuestionRoute.js')
 const PatientsPromtsRoute = require('./src/routes/PatientPromtsRoute.js')
 const DiagnosticsRoute = require('./src/routes/DiagnosticsRoute.js')
+const appointmentRoute = require('./src/routes/AppoinmentRoute.js')
 
 const path = require('path');
 const UserRouter = require("./src/routes/UserRoute.js");
+
 app.use("/images", express.static(path.join(__dirname, '/src/img')));
 
 //middlewears
@@ -39,7 +42,7 @@ db.once('open', () => {
 });
   
 // middleware
-app.use(AuthMiddleware)
+// app.use(AuthMiddleware)
 
 // regiter routes
 app.use(TestRoute);
@@ -52,9 +55,10 @@ app.use('/body-part', BodyPartRoute)
 app.use('/question', QuestionRoute)
 app.use('/promts',PatientsPromtsRoute)
 app.use('/diagnostics',DiagnosticsRoute)
+app.use('/appointment',appointmentRoute)
 
 const PORT = config.express.port;
 // listen
-app.listen(PORT, "0.0.0.0",() => {
+app.listen(PORT,"0.0.0.0",() => {
   console.log(`Server Started Url :- http://localhost:${PORT}`);
 });

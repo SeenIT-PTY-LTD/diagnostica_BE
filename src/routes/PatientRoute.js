@@ -1,13 +1,17 @@
 const Router = require('express').Router();
 const PatientController = require('../controller/PatientController');
+const { decryptReqMiddleware } = require('../middleWears/EncryptionMiddleware');
 const { validate } = require('../middleWears/ValidationsMiddleware');
 const Validations = require('../validations/PatientValidations')
 
 // registor patient
-Router.post('/registration',validate(Validations.RegistrationValidation), PatientController.Registration);
+Router.post('/registration',decryptReqMiddleware,validate(Validations.RegistrationValidation) , PatientController.Registration);
 
 // login
-Router.post('/login',validate(Validations.Login), PatientController.Login);
+Router.post('/login',decryptReqMiddleware,validate(Validations.Login), PatientController.Login);
+
+// login
+Router.get('/auth/info', PatientController.GetPatientByToken);
 
 // verify phone number
 Router.post('/varify-phone',validate(Validations.VerifyPhone), PatientController.VerifyPhone);

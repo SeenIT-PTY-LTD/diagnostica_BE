@@ -27,6 +27,10 @@ var schema = new Schema({
     },
     appointmentId : {
         type : String
+    },
+    appointmentRefId : {
+        type :  Schema.Types.ObjectId,
+        default : "petients"
     }
 },{ timestamps : true });
 

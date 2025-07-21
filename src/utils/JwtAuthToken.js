@@ -11,7 +11,7 @@ class JwtAuthToken {
 
             const result = await JWT.sign({
                 data
-            },secreteKey,{expiresIn:'1h'});
+            },secreteKey,{expiresIn:'48h'});
             
             return { status : true , result : result }
             

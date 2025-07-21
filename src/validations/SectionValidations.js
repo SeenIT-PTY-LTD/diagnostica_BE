@@ -3,7 +3,8 @@ const Joi = require('joi')
 const CreateEnteryValidation ={
     body : Joi.object({
        name : Joi.string().required(),
-       bodyPartId : Joi.string().required()
+       bodyPartId : Joi.string().required(),
+       sectionCode : Joi.string().required()
     })
 } 
 
@@ -27,7 +28,8 @@ const idParamsModel = {
 const GetAllEnteries = {
     query : Joi.object({
        search : Joi.string(),
-       searchCriteria : Joi.string()
+       searchCriteria : Joi.string(),
+       filters : Joi.string()
     })
 }
 

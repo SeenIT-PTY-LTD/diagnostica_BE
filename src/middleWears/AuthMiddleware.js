@@ -2,9 +2,9 @@ const Response = require('../utils/Response');
 const JWT = require('../utils/JwtAuthToken')
 
 
-const AuthMiddleware = (req, res, next) => {
+const AuthMiddleware = async(req, res, next) => {
   const exemptedRoutes = [
-    { method: "GET" , path: "/test" },
+    { method: "POST" , path: "/test" },
     { method: "POST", path: "/patient/registration" },
     { method: "POST", path: "/patient/login" },
     { method: "POST", path: "/patient/varify-phone" },
@@ -35,8 +35,8 @@ const AuthMiddleware = (req, res, next) => {
 
   try {
     // Verify token
-    const decoded = JWT.verify( token )
-    req.user = decoded; // Attach user info to the request object
+    const decoded = await JWT.verify( token )
+    req.user = decoded['result']['data']; // Attach user info to the request object
     next();
   } catch (err) {
 

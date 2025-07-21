@@ -9,30 +9,27 @@ const GetBodyPartPromtMetadata ={
 
 const GetSectionMetadata ={
     query : Joi.object({
-      bodyPartId : Joi.string().required(),
       patientId : Joi.string().required(),
       sectionId : Joi.string().required(),
-      patientIdPromtsId : Joi.string().required()
+      patientPromtId : Joi.string().required()
     })
 } 
 
 const UpdateSubSectionPromt ={
     params : Joi.object({
-      id : Joi.string().required()
     }),
     body : Joi.object({
-      bodyPartId : Joi.string().required(),
-      patientId : Joi.string().required(),
+      patientPromtId : Joi.string().required(),
       sectionId : Joi.string().required(),
-      subSectionData : Joi.array().required()
+      subSectionData : Joi.object().required()
     })
 } 
 
 const GetUserSelectedImgPromt ={
     query : Joi.object({
-      bodyPartId : Joi.string().required(),
+      bodyPartId : Joi.string(),
       patientId : Joi.string().required(),
-      sectionId : Joi.string().required()
+      sectionId : Joi.string()
     })
 } 
 

@@ -12,7 +12,8 @@ let config = {
         port : process.env.EXPRESS_PORT
     },
     ClientHost : process.env.CLIENT_HOST,
-    JwtSecretKey : process.env.JWT_SECRET_KEY
+    JwtSecretKey : process.env.JWT_SECRET_KEY,
+    CryptoSecretKey : process.env.CRYPTO_SECRET
 }
 
 module.exports = config;

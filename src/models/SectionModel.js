@@ -11,6 +11,10 @@ const schema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'bodyParts',
         required : true
+    },
+    sectionCode : {
+        type :String,
+        required : true
     }
 },{ timestamps : true }
 );

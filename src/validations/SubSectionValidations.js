@@ -15,7 +15,8 @@ const UpdateEntery = {
     body : Joi.object({
         name : Joi.string(),
         sectionId : Joi.string(),
-        instruction : Joi.string()
+        instruction : Joi.string(),
+        data : Joi.any()
     })
 }
 

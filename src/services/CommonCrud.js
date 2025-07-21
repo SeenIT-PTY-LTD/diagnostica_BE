@@ -30,11 +30,19 @@ class CommonCrud{
     };
     
     // Get Single Entery
-    getSingleEntery = async ( id ) => {
+    getSingleEntery = async ( id , filds ) => {
         try {
         
             const condition = { _id : id }
-            let result = await this.Model.find( condition );
+
+            let projection = {};
+
+            if(filds){
+                filds.forEach(element => {
+                    projection[element] = 1
+                });
+            }
+            let result = await this.Model.find( condition , projection);
 
             return Response.sendResponse( true , StatusCodes.OK , CustumMessages.SUCCESS , result  );
     

@@ -7,13 +7,14 @@ const CommonCrud = require("../services/CommonCrud");
 const { CustumMessages } = require("../utils/CustumMessages");
 const Response = require("../utils/Response");
 const { StatusCodes } = require("../utils/StatusCodes");
+const Constats = require("../utils/Constants");
 
 //common crud 
 const SectionCommonCrud = new CommonCrud(SectionModel);
 const SubSectionCommonCrud = new CommonCrud(SubSectionModel);
 const PatientsPromtsCommonCrud  = new CommonCrud(PatientsPromtsModel);
 const BodyPartCommonCrud  = new CommonCrud(BodyPartModel);
-const appointmentCommonCrud = new CommonCrud(AppoinmentModel)
+const AppointmentCommonCrud = new CommonCrud(AppoinmentModel)
 
 async function GetSectionsMetadata( req ,res ){
 
@@ -21,43 +22,19 @@ async function GetSectionsMetadata( req ,res ){
 
     try {
 
-        const {  bodyPartId , patientId } =  req.query;
+        const {  patientPromtId ,sectionId } =  req.query;
 
-        const userAttenptedSectionResponse = await PatientsPromtsCommonCrud.getEnteryBasedOnCondition({ status : "" , bodyPartId : bodyPartId, patientId: patientId });
+        const userAttenptedSectionResponse = await PatientsPromtsCommonCrud.getSingleEntery(patientPromtId);
 
         if(!userAttenptedSectionResponse.isSuccess){
             return res.status(userAttenptedSectionResponse.statusCode).send(userAttenptedSectionResponse)
         }
 
-        const sectioResponse = await SectionCommonCrud.getEnteryBasedOnCondition({ bodyPartId : bodyPartId });
+        console.log(userAttenptedSectionResponse,'****userAttenptedSectionResponse')
+        const userPromt = userAttenptedSectionResponse.result[0];
 
-        if(!sectioResponse.isSuccess){
-            return res.status(sectioResponse.statusCode).send(sectioResponse)
-        }
-
-        let result = {};
-        result.totalSections = sectioResponse.result.length;
-        result.completedSections = userAttenptedSectionResponse.result.length
-
-        const userPromts = userAttenptedSectionResponse.result;
-        const sectionsData = sectioResponse.result;
-
-        let sections = [];
-
-        sectionsData.forEach( ( section ,index ) => {
-
-            if(userPromts[index]){
-                sections.push(userPromts[index])
-            }else{
-                let obj = JSON.parse(JSON.stringify(section))
-                obj['sectionId'] = obj['_id']
-                obj['status'] = "Pending"
-                sections.push(obj)
-            }
-
-        });
-
-        result.sections = sections;
+        let result = userPromt.sections.filter( section => section._id.toString() == sectionId)
+        
 
         response = Response.sendResponse( false, StatusCodes.OK ,CustumMessages.SUCCESS, result )
 
@@ -77,41 +54,15 @@ async function GetSubSectionMetadata( req ,res ){
 
     try {
 
-        const { bodyPartId , patientId , sectionId } = req.query;
+        const { bodyPartId , patientId , sectionId ,patientPromtId } = req.query;
 
-        const userAttenptedSectionResponse = await PatientsPromtsCommonCrud.getEnteryBasedOnCondition({ bodyPartId : bodyPartId, patientId : patientId });
+        const userAttenptedSectionResponse = await PatientsPromtsCommonCrud.getSingleEntery(patientPromtId);
         if(!userAttenptedSectionResponse.isSuccess){
             return res.status(userAttenptedSectionResponse.statusCode).send(userAttenptedSectionResponse)
         }
 
-        const subSectionsResponse = await SubSectionCommonCrud.getEnteryBasedOnCondition( { sectionId : sectionId });
-
-        if(!subSectionsResponse.isSuccess){
-            return res.status(subSectionsResponse.statusCode).send(subSectionsResponse)
-        }
-
-        let subSectionMetaData = [];
-        const subSectionsData = subSectionsResponse.result;
-        const userPromtsData = userAttenptedSectionResponse.result.length ? userAttenptedSectionResponse.result[0].sections :  [];
-
-        let userPromtsSection = userPromtsData.filter((section)=> sectionId == section._id );
-
-        subSectionsData.forEach((subSection,index) =>{
-
-            if( userPromtsData.length ){
-                if(userPromtsSection[0]['subSections'][index]){
-                    subSectionMetaData.push(subSection)
-                    console.log('exist')
-                    return
-                }
-            } 
-
-            let obj = JSON.parse(JSON.stringify(subSection));
-            obj['status'] = "Pending"
-            subSectionMetaData.push(obj)
-            
-            
-        })
+        const userPromt = userAttenptedSectionResponse.result[0];
+        
 
         response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , subSectionMetaData )
 
@@ -129,122 +80,89 @@ async function UpdateSubSectionMetadata( req ,res ){
 
     try {
 
-        const { bodyPartId , patientId , sectionId , subSectionData } = req.body;
+        const { sectionId , subSectionData ,patientPromtId } = req.body;
 
-        const userAttenptedSectionResponse = await PatientsPromtsCommonCrud.getSingleEntery(req.params.id);
+        const userAttenptedSectionResponse = await PatientsPromtsCommonCrud.getSingleEntery(patientPromtId);
 
         if(!userAttenptedSectionResponse.isSuccess){
             return res.status(userAttenptedSectionResponse.statusCode).send(userAttenptedSectionResponse)
         }
 
-        let userAttenptedSectionData = {};
+        const bodyPartId = userAttenptedSectionResponse.result[0]['bodyPartId']
 
-        const sectionResponse = await SectionCommonCrud.getEnteryBasedOnCondition( { bodyPartId : bodyPartId });
+        const userAttenptedData = JSON.parse( JSON.stringify(userAttenptedSectionResponse.result[0]));
 
-        if(!sectionResponse.isSuccess){
-                return res.status(sectionResponse.statusCode).send(sectionResponse)
-        }
+        userAttenptedData.sections.forEach((section,sectionIndex) =>{
 
-        if( !userAttenptedSectionResponse.result.length ){
+            if(section._id.toString() == sectionId){
 
-            let sectionData = sectionResponse.result
+                section.subSections.forEach((subSection,subSectionIndex) =>{
 
-            userAttenptedSectionData.totalSections = sectionData.length;
-            userAttenptedSectionData.completedSections = 0;
-            userAttenptedSectionData.sections = [];
-            userAttenptedSectionData.patientId = patientId;
-            userAttenptedSectionData.bodyPartId = bodyPartId;
+                    if( subSectionData._id.toString() == subSection._id.toString()){
 
-            sectionData.forEach((section,index) =>{
+                        userAttenptedData.sections[sectionIndex]['subSections'][subSectionIndex] = subSectionData;
 
-                section = JSON.parse(JSON.stringify(section))
-                section.status = "Pending"
+                        let totalSubSection = userAttenptedData.sections[sectionIndex]['subSections'].length;
+                        let completedSubSectionCount = 0
 
-                if( section._id == sectionId ){
-                    section.subSections = [subSectionData]
-                }else{
-                    section.subSections = []
-                }
+                        userAttenptedData.sections[sectionIndex]['subSections'].forEach((subSection) =>{
+                            if(subSection.status == Constats.STATUS.COMPLETED ){
+                                completedSubSectionCount++
+                            }
+                        })  
 
-                userAttenptedSectionData.sections[index] = section
-            })
-        
-            response = await PatientsPromtsCommonCrud.creatEntery( userAttenptedSectionData)
-
-        }else{
-
-            const userAttenptedData = JSON.parse(JSON.stringify(userAttenptedSectionResponse.result))[0];
-            const userAttemotedDataSections = userAttenptedData['sections'];
-            let updateData = {};
-
-            userAttemotedDataSections.forEach((section) =>{
-
-                if(section._id == sectionId){
-                    section.subSections = subSectionData
-                }
-
-                let isPending = false
-                subSectionData.forEach((subSection) =>{
-                    if(subSection['status'] == "Pending"){
-                        isPending = true
+                        if(totalSubSection == completedSubSectionCount){
+                            userAttenptedData.sections[sectionIndex]['status'] = Constats.STATUS.COMPLETED;
+                        }
                     }
+
                 })
-
-                if(!isPending){
-                    section.status = "Completed"
-                }
-                
-            })
-
-            let completedSectionCount = 0;
-            let totalSectionCount = 0
-
-            userAttemotedDataSections.forEach((section) =>{
-                let totalSubSection = section['subSections'].length;
-                let completedSubSections  = 0
-                totalSectionCount++
-
-                section['subSections'].forEach((subSection) =>{
-                    if(subSection['status'] == "Completed"){
-                        completedSubSections++
-                    }
-                })
-
-                if( totalSubSection == completedSubSections){
-                    completedSectionCount++
-                }
-            })
-
-
-            if( completedSectionCount == totalSectionCount){
-                updateData['status'] = "Completed";
-                if(!userAttenptedData['appointmentRefId']){
-                   
-                   const bodyPartResponse = await BodyPartCommonCrud.getSingleEntery(bodyPartId);
-                   
-                   const appointmentId = bodyPartResponse['result'][0]['name'].split(" ").map(word => word[0]).join('').toUpperCase();
-
-                   const checkAppointmentIdExist = await appointmentCommonCrud.getEnteryBasedOnCondition({ appointmentId : appointmentId });
-
-                   if( checkAppointmentIdExist.result.length){
-                        response = await createAppointment( bodyPartId , patientId , req.params.id)
-                   }
-                }
                 
             }
 
-            updateData['sections'] = userAttemotedDataSections;
-            updateData['completedSections'] = completedSectionCount;
-            updateData['totalSections'] = totalSectionCount;
+        });
 
-            response = await PatientsPromtsCommonCrud.updateEntery( req.params.id , updateData )
+        let totalSectionCount = 0;
+        let completedSectionCount = 0;
+        userAttenptedData.sections.forEach((section) =>{
 
-            if(response.isSuccess){
-                response = await PatientsPromtsCommonCrud.getSingleEntery( req.params.id )
+            totalSectionCount++;
+
+            if(section['status'] == Constats.STATUS.COMPLETED ){
+                completedSectionCount++
             }
+        })
 
+        console.log(totalSectionCount,completedSectionCount)
+        if(totalSectionCount == completedSectionCount){
+
+            userAttenptedData['status'] = Constats.STATUS.COMPLETED;
+
+            response = await BodyPartCommonCrud.getSingleEntery(bodyPartId)
+
+            let appointmentId = response.result[0]['name'].split(' ').map((word) => word.charAt(0).toUpperCase()).join('')
+
+            const appoinmentResponse = await AppointmentCommonCrud.getCount({ bodyPartId : bodyPartId });
+            let count = appoinmentResponse.result.count + 1
+
+            appointmentId = appointmentId + "-" + count;
+
+            let data = {};
+            data['bodyPartId'] = bodyPartId;
+            data['appointmentId'] = appointmentId;
+            data['patientId'] = userAttenptedData['patientId'];
+            data['patientPromtIds'] = [ patientPromtId ]
+            
+            response = await AppointmentCommonCrud.creatEntery(data)
+            console.log('****create', response)
         }
-       
+        userAttenptedData['completedSections'] = completedSectionCount
+
+        response = await PatientsPromtsCommonCrud.updateEntery( patientPromtId , userAttenptedData )
+        if(response.isSuccess){
+            response = await PatientsPromtsCommonCrud.getSingleEntery( patientPromtId  )
+        }
+
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
@@ -253,6 +171,23 @@ async function UpdateSubSectionMetadata( req ,res ){
     return res.status(response.statusCode).send(response)
 }
 
+async function UploadImg( req ,res ){
+
+    let response
+
+    try {
+
+        let image = JSON.parse(JSON.stringify(req.file)).filename;
+
+        response = Response.sendResponse( true, StatusCodes.OK ,"Image uploaded successfully" , { image : image } )
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        
+    }
+
+    return res.status(response.statusCode).send(response)
+}
 
 async function CreateNewPatientPromts(req,res){
      let response
@@ -277,6 +212,31 @@ async function CreateNewPatientPromts(req,res){
             userAttenptedSectionData.sections = [];
             userAttenptedSectionData.patientId = patientId;
             userAttenptedSectionData.bodyPartId = bodyPartId;
+
+            for( let i = 0 ; i < sectionData.length; i++){
+
+                let section = JSON.parse(JSON.stringify(sectionData[i]))
+
+                console.log(section._id,'========sectionId1123')
+                console.log(section)
+
+                const sebSectionResponse = await SubSectionCommonCrud.getEnteryBasedOnCondition( { sectionId : sectionData[i]['_id'] });
+                const subSectionData = sebSectionResponse.result;
+
+                section.subSections = [];
+                section.status = Constats.STATUS.PENDING
+
+                for( let k = 0; k < subSectionData.length; k++){
+                
+                    let subSection = JSON.parse(JSON.stringify(subSectionData[k]))
+                    console.log('*****subSection',subSection)
+                    subSection['status'] = Constats.STATUS.PENDING;
+                    section.subSections.push(subSection)
+                }
+               
+                userAttenptedSectionData.sections.push(section)
+            }
+           
 
             response = await PatientsPromtsCommonCrud.creatEntery( userAttenptedSectionData);
 
@@ -352,8 +312,9 @@ async function GetUserSelectedPromtsImages( req ,res ){
 
     try {
         const { bodyPartId , patientId } = req.query;
-        response = await PatientsPromtsCommonCrud.getAllEnteriesWithoutLimit({},{bodyPartId : bodyPartId, patientId : patientId});
+        response = await PatientsPromtsCommonCrud.getAllEnteriesWithoutLimit({},{ patientId : patientId});
 
+        console.log(response,'******response')
         if(response.isSuccess){
             let result = await extractMediaByDate(response.result.list)
             response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , result )
@@ -452,53 +413,7 @@ function getSubSectionByDate(data, subSectionId) {
     return result
 }
 
-async function createAppointment( bodyPartId  , patientId , patientPromtId ){
 
-    let response
-
-    try {
-     
-        const bodyPartResponse = await BodyPartCommonCrud.getSingleEntery(bodyPartId);
-
-        const bodyPartData = bodyPartResponse.result[0];
-        const initials = appointmentId = bodyPartData['name'].split(" ").map(word => word[0]).join('').toUpperCase();
-
-        let isAppointmentPresent = true;
-        let number = 1;
-        let appointmentId = ""
-
-        while (isAppointmentPresent) {
-
-            appointmentId = initials + "-" + number
-            
-            const appointmentResponse = await appointmentCommonCrud.getEnteryBasedOnCondition({ appointmentId : appointmentId })
-
-            if(appointmentResponse.result.length){
-                number++
-            }else{
-               isAppointmentPresent = false
-            }
-
-        }
-
-        let data = {};
-        data['appointmentId'] = appointmentId;
-        data['patientId'] = patientId;
-        // data['doctorId'] = doctorId
-        data['patientPromtIds'] = [
-            patientPromtId
-        ]
-        
-        response = await appointmentCommonCrud.creatEntery(data)
-        
-
-    } catch (error) {
-        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
-        
-    }
-
-    return response
-}
 
 
 module.exports = {
@@ -508,5 +423,6 @@ module.exports = {
   GetUserSelectedPromtsImages,
   GetUserAttemptedSubSectionPromtsDateWise,
   CreateNewPatientPromts,
-  AssignPromtByDoctor
+  AssignPromtByDoctor,
+  UploadImg
 }

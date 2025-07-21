@@ -21,6 +21,12 @@ const schema = new mongoose.Schema({
         type: String,
         required : true  
     },
+    medicareNumber : {
+        type : String
+    },
+    urn : {
+        type : String
+    },
     phone:{
         type: String,
         required : true
@@ -34,10 +40,6 @@ const schema = new mongoose.Schema({
         default:""
     },
     state:{
-        type: String,
-        default:""
-    },
-    postcode:{
         type: String,
         default:""
     },
@@ -61,15 +63,17 @@ const schema = new mongoose.Schema({
         type: String,
         default:""
     },
-    urn : {
-        type: String,
-        default:""
-    },
     isActive : {
         type : Boolean,
         default : true
-    }
-
+    },
+    patientCode : {
+        type : String
+    },
+    postcode : {
+        type : String
+    },
+ 
 },{ timestamps : true });
 
 const PatientModel = new mongoose.model('patient', schema);

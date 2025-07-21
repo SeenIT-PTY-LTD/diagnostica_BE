@@ -4,7 +4,7 @@ const { validate } = require('../middleWears/ValidationsMiddleware');
 const Validations = require('../validations/UserValidations')
 
 // registor user
-UserRouter.post('/registration',validate(Validations.RegistrationValidation), UserController.CreateEntery);
+UserRouter.post('/registration', validate(Validations.RegistrationValidation), UserController.CreateEntery);
 
 // login
 UserRouter.post('/login',validate(Validations.Login), UserController.Login);
@@ -33,6 +33,6 @@ UserRouter.get('/:id',validate(Validations.idParamsModel), UserController.GetSin
 // get all user
 UserRouter.get('/',validate(Validations.GetAllEnteries), UserController.GetAllEnteries);
 
-
+UserRouter.get('/auth/info',  UserController.GetAuthInfo)
 
 module.exports = UserRouter;

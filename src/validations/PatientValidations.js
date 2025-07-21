@@ -10,13 +10,15 @@ const RegistrationValidation ={
         dob : Joi.string().required(),
         gender : Joi.string().required(),
         email : Joi.string().required(),
+        bmi : Joi.string(),
         country : Joi.string(),
         urn : Joi.string(),
         height : Joi.string(),
         weight : Joi.string(),
         address : Joi.string(),
         state : Joi.string(),
-        postcode : Joi.string()
+        postcode : Joi.string(),
+        // token : Joi.string().required()
     })
 } 
 
@@ -50,7 +52,9 @@ const Update = {
         weight : Joi.string(),
         address : Joi.string(),
         state : Joi.string(),
-        postcode : Joi.string()
+        postcode : Joi.string(),
+        patientCode : Joi.string(),
+        medicareNumber: Joi.string(),
     })
 }
 

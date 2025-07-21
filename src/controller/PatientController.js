@@ -5,10 +5,34 @@ const Encryption = require("../utils/Encryption");
 const Response = require("../utils/Response");
 const JWT = require('../utils/JwtAuthToken')
 const { StatusCodes } = require("../utils/StatusCodes");
-
+const { encryptObject, decryptString, DefaultencryptObject } = require("../utils/Crypto");
+const config = require('../config/config')
 
 //common crud 
 const PatientCommonCrud = new CommonCrud(PatientModel)
+
+let patientFilds = [ 
+    'firstName',
+    'lastName',
+    'dob',
+    "gender",
+    "email",
+    "medicareNumber" ,
+    "urn" ,
+    "phone",
+    "countryCode" ,
+    "address",
+    "state",
+    "password",
+    "height",
+    "weight",
+    "bmi",
+    "country",
+    "isActive",
+    "patientCode",
+    "postcode"
+]
+
 
 async function Registration( req ,res ){
 
@@ -34,7 +58,8 @@ async function Registration( req ,res ){
         response = await PatientCommonCrud.creatEntery(req.body);
 
         if(response.isSuccess){
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , "Patient created successfully" )
+            let encryptBody = await DefaultencryptObject(req.body)
+            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,{ token : encryptBody } )
         }
 
     } catch (error) {
@@ -45,6 +70,10 @@ async function Registration( req ,res ){
     return res.status(response.statusCode).send(response)
 
 }
+
+
+
+
 
 async function Login( req ,res ){
 
@@ -70,15 +99,19 @@ async function Login( req ,res ){
         let compare = await Encryption.compare(  password, patient['password']  )
 
         if( compare['status']){
-            const token = await JWT.createToken({ email : req.body.email , id : patient._id })
+            const token = await JWT.createToken({ email : req.body.email , id : patient._id , role : "patient" })
 
             if(token['status']){
-                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, { 
-                    token : token['result'] , 
-                    id : patient._id , 
-                    name : patient.firstName,
-                    email : patient.email
-                })
+
+                let result = {
+                    authToken : token['result'],
+                    email : email,
+                    phone : patient['phone']
+                }
+
+                result = DefaultencryptObject(result);
+
+                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, { token : result })
             }else{
                 response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR, token['error'], {  })
             }
@@ -86,6 +119,27 @@ async function Login( req ,res ){
         }
 
         response = Response.sendResponse(false,StatusCodes.UNAUTHORIZED, CustumMessages.INCORRECT_CREDENTIALS, {  })
+        return res.status(response.statusCode).send(response);
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        return res.status(response.statusCode).send(response)
+    }
+
+}
+
+async function GetPatientByToken( req ,res ){
+
+    let response
+
+    try {
+
+        response = await PatientCommonCrud.getSingleEntery( req.user.id )
+
+        const token = await encryptObject( response.result[0] , config.CryptoSecretKey )
+        
+        response = Response.sendResponse(true,StatusCodes.OK, CustumMessages.SUCCESS, { token : token  })
+
         return res.status(response.statusCode).send(response);
 
     } catch (error) {
@@ -129,6 +183,36 @@ async function UpdateEntery( req ,res ){
 
     try {
 
+        if( req.body.phone){
+            response = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone })
+
+            if(response.isSuccess && response.result.length){
+
+                if( response.result[0]['_id'].toString() != req.params.id.toString() ){
+                    response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , CustumMessages.PATIENT_ALREADY_EXIST_WITH_SAME_MOBILE , {} )
+                    return res.status(response.statusCode).send(response)
+
+                }
+               
+
+            }
+        }
+
+        if( req.body.email ){
+
+            response = await PatientCommonCrud.getEnteryBasedOnCondition({ email : req.body.email })
+
+             if(response.isSuccess && response.result.length){
+
+                if( response.result[0]['_id'].toString() != req.params.id.toString() ){
+                    response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , CustumMessages.PATIENT_ALREADY_EXIST_WITH_SAME_EMAIL , {} )
+                    return res.status(response.statusCode).send(response)
+
+                }
+
+            }
+        }
+       
         response = await PatientCommonCrud.updateEntery(req.params.id, req.body);
 
     } catch (error) {
@@ -211,7 +295,7 @@ async function GetAllEnteries( req ,res ){
 
     try {
 
-        response = await PatientCommonCrud.getAllEnteries(req.query ,{});
+        response = await PatientCommonCrud.getAllEnteries(req.query ,{ isActive : true});
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
@@ -249,5 +333,6 @@ module.exports = {
     ResetPasswordByPhone,
     DeleteEntery,
     GetAllEnteries,
-    GetSingleEntery    
+    GetSingleEntery,   
+    GetPatientByToken
 }

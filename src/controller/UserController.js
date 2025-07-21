@@ -7,6 +7,8 @@ const JWT = require('../utils/JwtAuthToken')
 const { StatusCodes } = require("../utils/StatusCodes");
 const EmailService = require('../services/EmailService');
 const PatientModel = require("../models/PatientModel");
+const { encryptObject } = require("../utils/Crypto");
+const config = require("../config/config");
 
 //common crud 
 const UserCommanCrud = new CommonCrud(UserModel)
@@ -35,8 +37,10 @@ async function CreateEntery( req ,res ){
         req.body.password = await Encryption.encrypt(req.body.password);
         response = await UserCommanCrud.creatEntery(req.body);
 
+
         if(response.isSuccess){
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , "Doctor created successfully" )
+            let encrypt = await encryptObject( req.body , config.CryptoSecretKey )
+            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , { token : encrypt } )
         }
 
     } catch (error) {
@@ -234,6 +238,23 @@ async function GetSingleEntery( req ,res ){
 
 }
 
+async function GetAuthInfo( req ,res ){
+
+    let response
+
+    try {
+
+        response = await UserCommanCrud.getSingleEntery( req.user.id );
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        
+    }
+
+    return res.status(response.statusCode).send(response)
+
+}
+
 async function ForgotPasswordWithEmail( req ,res ){
 
     let response
@@ -292,8 +313,6 @@ async function ResetPassword( req ,res ){
 
         const verifyToken = await JWT.verify(token);
 
-        console.log(verifyToken,'*****verifyToken')
-
         if(!verifyToken['status']){
             response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , verifyToken['error'] , {} )
             return res.status(response.statusCode).send(response)
@@ -341,5 +360,6 @@ module.exports = {
     GetSingleEntery,
     ForgotPasswordWithEmail,
     ResetPassword,
-    GetUserDashboardCounts
+    GetUserDashboardCounts,
+    GetAuthInfo
 }

@@ -32,6 +32,10 @@ exports.CustumMessages = {
 
     CITY_WITH_SAME_CODE: "City With Same Code Is Already Present",
 
-    RESET_PASSWORD_SUCCESSFULLY : "Reset password successfully"
+    RESET_PASSWORD_SUCCESSFULLY : "Reset password successfully",
+
+    PATIENT_ALREADY_EXIST_WITH_SAME_EMAIL : "Patient is already exist witj same email",
+
+    PATIENT_ALREADY_EXIST_WITH_SAME_MOBILE : "Patient is already exist witj same mobile number"
 
 }
