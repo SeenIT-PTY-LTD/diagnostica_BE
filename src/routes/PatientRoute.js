@@ -17,7 +17,7 @@ Router.get('/auth/info', PatientController.GetPatientByToken);
 Router.post('/varify-phone',validate(Validations.VerifyPhone), PatientController.VerifyPhone);
 
 // change password by phone
-Router.put('/reset-password-by-phone',validate(Validations.ResetPasswordByPhone), PatientController.ResetPasswordByPhone);
+Router.put('/reset-password-by-phone', validate(Validations.ResetPasswordByPhone), PatientController.ResetPasswordByPhone);
 
 // reset password by email
 Router.put('/reset-password-by-email',validate(Validations.ResetPasswordByEmail), PatientController.ResetPasswordByEmail);

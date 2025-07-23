@@ -19,6 +19,6 @@ const schema = new Schema({
 },{ timestamps : true }
 );
 
-const SubSectionModel = new mongoose.model('subSection', schema);
+const SubSectionModel = new mongoose.model('sub_section', schema);
 
 module.exports = SubSectionModel;

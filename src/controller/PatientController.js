@@ -5,7 +5,7 @@ const Encryption = require("../utils/Encryption");
 const Response = require("../utils/Response");
 const JWT = require('../utils/JwtAuthToken')
 const { StatusCodes } = require("../utils/StatusCodes");
-const { encryptObject, decryptString, DefaultencryptObject } = require("../utils/Crypto");
+const { encryptObject, decryptString, DefaultencryptObject, decryptObject, defaultDecryptObject, DefaultEncryptObject } = require("../utils/Crypto");
 const config = require('../config/config')
 
 //common crud 
@@ -57,9 +57,13 @@ async function Registration( req ,res ){
         req.body.password = await Encryption.encrypt(req.body.password);
         response = await PatientCommonCrud.creatEntery(req.body);
 
+        console.log('****************create',response)
         if(response.isSuccess){
-            let encryptBody = await DefaultencryptObject(req.body)
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,{ token : encryptBody } )
+            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,req.body )
+            console.log(response,'******response')
+            let resBody = await DefaultEncryptObject( response )
+            console.log('***resbody',resBody)
+            return res.status(response.statusCode).send(resBody)
         }
 
     } catch (error) {
@@ -103,15 +107,14 @@ async function Login( req ,res ){
 
             if(token['status']){
 
-                let result = {
-                    authToken : token['result'],
-                    email : email,
-                    phone : patient['phone']
-                }
+                let result = JSON.parse( JSON.stringify(patient));
+                delete result.password
+                result['authToken'] = token['result']
+                
+                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, result )
+                let resBody = await DefaultEncryptObject(response)
+                return res.status(StatusCodes.OK).send(resBody)
 
-                result = DefaultencryptObject(result);
-
-                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, { token : result })
             }else{
                 response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR, token['error'], {  })
             }

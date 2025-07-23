@@ -17,7 +17,7 @@ const encryptObject = (encryptValue, SecretKey) => {
 }
 
 
-const DefaultencryptObject = (encryptValue) => {
+const DefaultEncryptObject = (encryptValue) => {
     try {
         encryptValue = JSON.stringify(encryptValue)
         let ciphertext = CryptoJS.AES.encrypt(encryptValue, Config.CryptoSecretKey).toString();
@@ -32,6 +32,19 @@ const DefaultencryptObject = (encryptValue) => {
 const decryptObject = (decryptValue, SecretKey) => {
     try {
         let bytes = CryptoJS.AES.decrypt(decryptValue, SecretKey);
+        let decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        // console.log(decryptedData, 'decryptObject', bytes.toString(CryptoJS.enc.Utf8))
+        return decryptedData
+    }
+    catch (err) {
+        console.log(err, 'decryptObject__err')
+        return ''
+    }
+}
+
+const defaultDecryptObject = (decryptValue) => {
+    try {
+        let bytes = CryptoJS.AES.decrypt(decryptValue, config.CryptoSecretKey);
         let decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         // console.log(decryptedData, 'decryptObject', bytes.toString(CryptoJS.enc.Utf8))
         return decryptedData
@@ -137,11 +150,12 @@ const generateSignature = (value, secretKey) => {
 
 module.exports = {
     encryptObject,
-    DefaultencryptObject,
+    DefaultEncryptObject,
     decryptObject,
     encryptString,
     decryptString,
     generateSignature,
     generatesecretKey,
-    randomByte
+    randomByte,
+    defaultDecryptObject
 }

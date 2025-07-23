@@ -34,6 +34,6 @@ var schema = new Schema({
     }
 },{ timestamps : true });
 
-const PatientPromtsModel = new mongoose.model('patientPromt', schema);
+const PatientPromtsModel = new mongoose.model('patient_promt', schema);
 
 module.exports = PatientPromtsModel;

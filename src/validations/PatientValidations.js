@@ -70,6 +70,7 @@ const ResetPasswordByPhone = {
     body : Joi.object({
         password : Joi.string().required(),
         phone : Joi.string().required(),
+        countryCode : Joi.string().required()
    
     })
 }

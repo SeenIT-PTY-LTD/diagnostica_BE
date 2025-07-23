@@ -8,6 +8,6 @@ var schema = new Schema({
     }
 });
 
-const bodyPartModel = new mongoose.model('bodyPart', schema);
+const bodyPartModel = new mongoose.model('body_part', schema);
 
 module.exports = bodyPartModel;
