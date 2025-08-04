@@ -76,10 +76,10 @@ const AuthMiddleware = async(req, res, next) => {
 
       const user = response.result[0];
 
-      if(user['secretKey'] != secretKey ){
-        let response = Response.sendResponse( false , 401 ,'Session expired', {})
-        return res.status(response.statusCode).json(response);
-      }
+      // if(user['secretKey'] != secretKey ){
+      //   let response = Response.sendResponse( false , 401 ,'Session expired', {})
+      //   return res.status(response.statusCode).json(response);
+      // }
       req.user = user; 
 
     }

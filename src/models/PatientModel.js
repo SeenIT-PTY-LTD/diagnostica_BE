@@ -1,79 +1,201 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-    firstName:{
+    firstName: {
         type: String,
-        required : true
+        required: true
     },
-    lastName:{
+    lastName: {
         type: String,
-        required : true
+        required: true
     },
-    dob:{
+    dob: {
         type: String,
-        default:""
+        default: ""
     },
-    gender:{
+    gender: {
         type: String,
-        default:""
+        default: ""
     },
-    email:{
+    email: {
         type: String,
-        required : true  
+        required: true
     },
-    medicareNumber : {
-        type : String
+    medicareNumber: {
+        type: String
     },
-    urn : {
-        type : String
+    urn: {
+        type: String
     },
-    phone:{
+    phone: {
         type: String,
-        required : true
+        required: true
     },
-    countryCode : {
-        type : String,
-        required : true
-    },
-    address:{
+    countryCode: {
         type: String,
-        default:""
+        required: true
     },
-    state:{
+    address: {
         type: String,
-        default:""
+        default: ""
     },
-    password:{
+    state: {
         type: String,
-        required : true
+        default: ""
     },
-    height :{
+    password: {
         type: String,
-        default:""
+        required: true
     },
-    weight : {
+    height: {
         type: String,
-        default:""
+        default: ""
     },
-    country : {
+    weight: {
         type: String,
-        default:""
+        default: ""
     },
-    isActive : {
-        type : Boolean,
-        default : true
+    country: {
+        type: String,
+        default: ""
     },
-    patientCode : {
-        type : String
+    isActive: {
+        type: Boolean,
+        default: true
     },
-    postcode : {
-        type : String
+    patientCode: {
+        type: String
     },
-    secretKey : {
-        type : String
-    }
- 
-},{ timestamps : true });
+    postcode: {
+        type: String
+    },
+    secretKey: {
+        type: String
+    },
+    medicalCard: {
+        type: String
+    },
+    personId: {
+        type: String
+    },
+    occupation: {
+        type: String
+    },
+    emergencyContactPerson: {
+        type: String
+    },
+    emergencyContactNumber: {
+        type: String
+    },
+    relationship: {
+        type: String
+    },
+    privateHealthInsurance: {
+        type: String
+    },
+    healthFund: {
+        type: String,
+    },
+    memberNumber: {
+        type: String
+    },
+    pensionNumber: {
+        type: String
+    },
+    expiryDate: {
+        type: String,
+    },
+    questionReply: {
+        type: String,
+    },
+    doctorType: {
+        type: String,
+    },
+    doctorAddress: {
+        type: String,
+    },
+    referDoctorNumber: {
+        type: String,
+    },
+    generalDoctorName: {
+        type: String,
+    },
+    generaldoctorNumber: {
+        type: String,
+    },
+    generalDoctorAddress: {
+        type: String,
+    },
+    physiotherapistName: {
+        type: String,
+    },
+    physiotherapistNumber: {
+        type: String,
+    },
+    physiotherapistAddress: {
+        type: String,
+    },
+    claimNumber: {
+        type: String,
+    },
+    dateOfInjury: {
+        type: String,
+    },
+    companyName: {
+        type: String,
+    },
+    permanentAddress: {
+        type: String,
+    },
+    contactPersonNameAtWorkplace: {
+        type: String,
+    },
+    contactPersonFirstName: {
+        type: String,
+    },
+    contactPersonLastName: {
+        type: String,
+    },
+    insuranceCompanyName: {
+        type: String,
+    },
+    insuranceCompanyAddress: {
+        type: String,
+    },
+    managerFirstName: {
+        type: String,
+    },
+    managerLastName: {
+        type: String,
+    },
+    managerPhone: {
+        type: String,
+    },
+    managerEmail: {
+        type: String,
+    },
+    medicationsFaqs: {
+        type: Array,
+        default: []
+    },
+    mriSafetyFaqs: {
+        type: Array,
+        default: []
+    },
+    surgicalFaqs: {
+        type: Array,
+        default: []
+    },
+    medicalFaqs: {
+        type: Array,
+        default: []
+    },
+    othersFaqs: {
+        type: Array,
+        default: []
+    },
+
+}, { timestamps: true });
 
 const PatientModel = new mongoose.model('patient', schema);
 
