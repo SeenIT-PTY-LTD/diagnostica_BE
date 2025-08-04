@@ -15,13 +15,12 @@ const GetSectionMetadata ={
     })
 } 
 
-const UpdateSubSectionPromt ={
-    params : Joi.object({
-    }),
+const UpdateSubSectionPrompt ={
+   
     body : Joi.object({
       patientPromtId : Joi.string().required(),
       sectionId : Joi.string().required(),
-      subSectionData : Joi.object().required()
+      sectionData : Joi.object().required()
     })
 } 
 
@@ -57,13 +56,19 @@ const AssignByDoctor ={
     })
 } 
 
+const GetPromtsByBodypart = {
+    query : Joi.object({
+      bodyPartId : Joi.string().required(),
+    })
+}
 
 module.exports = {
     GetBodyPartPromtMetadata,
     GetSectionMetadata,
-    UpdateSubSectionPromt,
+    UpdateSubSectionPrompt,
     GetUserSelectedImgPromt,
     AttemptedSubSectionByDate,
     CreatePatientPromt,
-    AssignByDoctor
+    AssignByDoctor,
+    GetPromtsByBodypart
 }

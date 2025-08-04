@@ -26,11 +26,33 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  medicareNumber : {
+    type: String,
+    required: true,
+  },
+  genderSpecificCare : {
+    type : Boolean
+  },
   token : {
     type: String,
   },
+  hospitals : {
+    type : String
+  },
+  location : {
+    type :String
+  },
+  pediatricSpecialist : {
+    type : Boolean
+  },
+  specialization : {
+    type : String
+  },
   tokenExpiry :{
     type : Date
+  },
+  secretKey : {
+    type : String
   },
   isActive : {
     type : Boolean,
@@ -41,3 +63,5 @@ const schema = new mongoose.Schema({
 const DoctorModel = new mongoose.model('user',schema);
 
 module.exports = DoctorModel;
+       
+      

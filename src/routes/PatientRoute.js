@@ -11,13 +11,13 @@ Router.post('/registration',decryptReqMiddleware,validate(Validations.Registrati
 Router.post('/login',decryptReqMiddleware,validate(Validations.Login), PatientController.Login);
 
 // login
-Router.get('/auth/info', PatientController.GetPatientByToken);
+Router.get('/get-patient-detail', PatientController.GetPatientDeatils);
 
 // verify phone number
-Router.post('/varify-phone',validate(Validations.VerifyPhone), PatientController.VerifyPhone);
+Router.post('/varify-phone',decryptReqMiddleware ,validate(Validations.VerifyPhone), PatientController.VerifyPhone);
 
 // change password by phone
-Router.put('/reset-password-by-phone', validate(Validations.ResetPasswordByPhone), PatientController.ResetPasswordByPhone);
+Router.put('/reset-password-by-phone',decryptReqMiddleware, validate(Validations.ResetPasswordByPhone), PatientController.ResetPasswordByPhone);
 
 // reset password by email
 Router.put('/reset-password-by-email',validate(Validations.ResetPasswordByEmail), PatientController.ResetPasswordByEmail);
@@ -26,7 +26,7 @@ Router.put('/reset-password-by-email',validate(Validations.ResetPasswordByEmail)
 Router.put('/:id',validate(Validations.Update), PatientController.UpdateEntery);
 
 // delete patient by id
-Router.delete('/:id',validate(Validations.idParamsModel), PatientController.DeleteEntery);
+Router.delete('/', PatientController.DeleteEntery);
 
 // get single patient
 Router.get('/:id',validate(Validations.idParamsModel), PatientController.GetSingleEntery);

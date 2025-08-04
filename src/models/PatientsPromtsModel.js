@@ -13,7 +13,7 @@ var schema = new Schema({
     },
     patientId : {
         type :  Schema.Types.ObjectId,
-        default : "petients"
+        ref : "patients"
     },
     sections : {
         type : [],
@@ -30,10 +30,14 @@ var schema = new Schema({
     },
     appointmentRefId : {
         type :  Schema.Types.ObjectId,
-        default : "petients"
+        ref : "appointments"
+    },
+    isFollowUp : {
+        type : Boolean,
+        default : false
     }
 },{ timestamps : true });
 
-const PatientPromtsModel = new mongoose.model('patient_promt', schema);
+const PatientPromptsModel = new mongoose.model('patient_prompt', schema);
 
-module.exports = PatientPromtsModel;
+module.exports = PatientPromptsModel;

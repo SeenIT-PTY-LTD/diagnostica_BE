@@ -17,12 +17,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
+// registor patient
+Router.get('/get-by-body-part',validate(Validations.GetPromtsByBodypart), controller.GetPromtsByBodypart);
+
 // registor patient
 Router.get('/get-body-part-data',validate(Validations.GetBodyPartPromtMetadata), controller.GetSectionsMetadata);
 
 Router.get('/get-section-data', validate(Validations.GetSectionMetadata),controller.GetSectionsMetadata);
 
-Router.put('/update-section-data', validate(Validations.UpdateSubSectionPromt),controller.UpdateSubSectionMetadata);
+Router.put('/update-section-data', validate(Validations.UpdateSubSectionPrompt),controller.UpdateSubSectionMetadata);
 
 Router.post('/upload-img',upload.single('image'), controller.UploadImg )
 

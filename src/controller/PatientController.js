@@ -6,10 +6,13 @@ const Response = require("../utils/Response");
 const JWT = require('../utils/JwtAuthToken')
 const { StatusCodes } = require("../utils/StatusCodes");
 const { encryptObject, decryptString, DefaultencryptObject, decryptObject, defaultDecryptObject, DefaultEncryptObject } = require("../utils/Crypto");
-const config = require('../config/config')
+const config = require('../config/config');
+const PatientPromptsModel = require("../models/PatientsPromtsModel");
+const Constats = require("../utils/Constants");
 
 //common crud 
 const PatientCommonCrud = new CommonCrud(PatientModel)
+const PatientPromptsCrud = new CommonCrud(PatientPromptsModel)
 
 let patientFilds = [ 
     'firstName',
@@ -46,7 +49,6 @@ async function Registration( req ,res ){
             response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Email is alrady present" , {} )
             return res.status(response.statusCode).send(response)
         }
-
         const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone , countryCode : req.body.countryCode , isActive : true })
 
         if(checkPhone ['isSuccess'] && checkPhone['result'].length){
@@ -55,18 +57,19 @@ async function Registration( req ,res ){
         }
 
         req.body.password = await Encryption.encrypt(req.body.password);
+        req.body.secretKey = await Encryption.randomKey()
         response = await PatientCommonCrud.creatEntery(req.body);
 
-        console.log('****************create',response)
         if(response.isSuccess){
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,req.body )
+            response = Response.sendResponse( true, StatusCodes.OK , "patient registration sucessfully" , {} )
             console.log(response,'******response')
-            let resBody = await DefaultEncryptObject( response )
-            console.log('***resbody',resBody)
-            return res.status(response.statusCode).send(resBody)
+            // let resBody = await DefaultEncryptObject( response )
+            // console.log('***resbody',resBody)
+            return res.status(response.statusCode).send(response)
         }
 
     } catch (error) {
+    
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
 
     }
@@ -74,9 +77,6 @@ async function Registration( req ,res ){
     return res.status(response.statusCode).send(response)
 
 }
-
-
-
 
 
 async function Login( req ,res ){
@@ -90,12 +90,16 @@ async function Login( req ,res ){
         response = await PatientCommonCrud.getEnteryBasedOnCondition({ email : email , isActive : true  });
 
         if( !response['isSuccess'] ){
-            return res.status(response.statusCode).send(response)
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(response.statusCode).send(resBody)
         }
 
         if( response['isSuccess'] && !response['result'].length ){
             response = Response.sendResponse(false,StatusCodes.UNAUTHORIZED, CustumMessages.USER_NOT_Present, {})
-            return res.status(response.statusCode).send(response)
+            console.log(response)
+            let resBody = await DefaultEncryptObject(response)
+            console.log(resBody,'*******resBOady')
+            return res.status(response.statusCode).send(resBody)
         }
 
         let patient = response['result'][0];
@@ -103,47 +107,69 @@ async function Login( req ,res ){
         let compare = await Encryption.compare(  password, patient['password']  )
 
         if( compare['status']){
-            const token = await JWT.createToken({ email : req.body.email , id : patient._id , role : "patient" })
+
+            let secretKey = await Encryption.randomKey()
+
+            response = await PatientCommonCrud.updateEntery( patient._id.toString() ,{ secretKey : secretKey })
+
+            const token = await JWT.createToken({ id : patient._id , role : "patient" , secretKey : secretKey })
+
+            console.log(token)
+
 
             if(token['status']){
 
-                let result = JSON.parse( JSON.stringify(patient));
-                delete result.password
-                result['authToken'] = token['result']
-                
-                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, result )
+                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, {  authToken : token['result'] } )
                 let resBody = await DefaultEncryptObject(response)
                 return res.status(StatusCodes.OK).send(resBody)
 
             }else{
+                
                 response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR, token['error'], {  })
+                let resBody = await DefaultEncryptObject(response)
+                return res.status(response.statusCode).send(resBody)
             }
-            return res.status(response.statusCode).send(response)
         }
 
         response = Response.sendResponse(false,StatusCodes.UNAUTHORIZED, CustumMessages.INCORRECT_CREDENTIALS, {  })
-        return res.status(response.statusCode).send(response);
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
-        return res.status(response.statusCode).send(response)
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
     }
 
 }
 
-async function GetPatientByToken( req ,res ){
+async function GetPatientDeatils( req ,res ){
 
     let response
 
     try {
 
-        response = await PatientCommonCrud.getSingleEntery( req.user.id )
+        let result = JSON.parse( JSON.stringify( req.user ));
 
-        const token = await encryptObject( response.result[0] , config.CryptoSecretKey )
-        
-        response = Response.sendResponse(true,StatusCodes.OK, CustumMessages.SUCCESS, { token : token  })
+        const patientId = result['_id'].toString()
 
-        return res.status(response.statusCode).send(response);
+        delete result.password
+
+        const patientPromtResponse  = await PatientPromptsCrud.getEnteryBasedOnCondition({ patientId : patientId , status : Constats.STATUS.PENDING ,isFollowUp : false });
+
+        console.log(patientPromtResponse,'******patientPromtResponse*****')
+
+        result['promptIds'] =  patientPromtResponse.result.map( promt => promt._id.toString())
+
+        const patientPromtFollowUpResponse  = await PatientPromptsCrud.getEnteryBasedOnCondition({ patientId : patientId , status : Constats.STATUS.PENDING ,isFollowUp : true });
+
+        result['appoinmentIds'] = patientPromtFollowUpResponse.result.map( promt => promt._id.toString())
+
+        response = Response.sendResponse(true,StatusCodes.OK, CustumMessages.SUCCESS, result )
+
+        console.log(response,'***response')
+        const token = await DefaultEncryptObject( response )
+        return res.status(response.statusCode).send(token);
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
@@ -158,24 +184,30 @@ async function VerifyPhone( req ,res ){
 
     try {
 
-        response = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone , isActive : true });
+        console.log({phone : req.body.phone ,countryCode :  req.body.countryCode, isActive : true })
+
+        response = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone ,countryCode :  req.body.countryCode, isActive : true });
 
         if( !response['isSuccess'] ){
-            return res.status(response.statusCode).send(response)
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(response.statusCode).send(resBody)
         }
 
         if( response['isSuccess'] && response['result'].length ){
             response = Response.sendResponse(true,StatusCodes.OK, CustumMessages.SUCCESS, {})
-            return res.status(response.statusCode).send(response)
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(response.statusCode).send(resBody)
         }
 
         response = Response.sendResponse(false,StatusCodes.NOT_FOUND, CustumMessages.USER_NOT_Present, {})
-        return res.status(response.statusCode).send(response)
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
 
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
-        return res.status(response.statusCode).send(response)
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
     }
 
 }
@@ -238,15 +270,23 @@ async function ResetPasswordByEmail( req ,res ){
         }
 
         const password = await Encryption.encrypt(req.body.password)
-
         response = await PatientCommonCrud.updateEnteryBasedOnCondition( condition , { password : password} );
+
+        if(response.isSuccess){
+            response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , "password reset successfully" , {})
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(response.statusCode).send(resBody)
+        }
+         
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
         
     }
-
-    return res.status(response.statusCode).send(response)
 
 }
 
@@ -258,19 +298,38 @@ async function ResetPasswordByPhone( req ,res ){
     try {
 
         const condition = {
-            phone : req.body.phone
+            phone : req.body.phone,
+            countryCode : "+"+ req.body.countryCode
         }
 
         const password = await Encryption.encrypt(req.body.password)
+        response = await PatientCommonCrud.getEnteryBasedOnCondition( condition);
+
+        if(response.isSuccess && !response.result.length){
+            response = Response.sendResponse( false, StatusCodes.NOT_FOUND , "User not exist" , {})
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(response.statusCode).send(resBody)
+        }
 
         response = await PatientCommonCrud.updateEnteryBasedOnCondition( condition , { password : password} );
 
+         if(response.isSuccess){
+            response = Response.sendResponse( true, StatusCodes.OK , "password reset successfully" , {})
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(response.statusCode).send(resBody)
+        }
+         
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
+
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
         
     }
 
-    return res.status(response.statusCode).send(response)
+   
 
 }
 
@@ -280,9 +339,11 @@ async function DeleteEntery( req ,res ){
 
     try {
 
-        response = await PatientCommonCrud.updateEntery( req.params.id, { isActive : false} );
+        response = await PatientCommonCrud.updateEntery( req.user._id.toString(), { isActive : false} );
+        console.log(response)
 
     } catch (error) {
+        console.log(error)
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
     }
@@ -298,7 +359,13 @@ async function GetAllEnteries( req ,res ){
 
     try {
 
-        response = await PatientCommonCrud.getAllEnteries(req.query ,{ isActive : true});
+
+        let condition = {};
+
+        condition['isActive'] = true;
+        if(req.query.role) condition['role'] = req.query.role
+
+        response = await PatientCommonCrud.getAllEnteries(req.query ,condition );
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
@@ -337,5 +404,5 @@ module.exports = {
     DeleteEntery,
     GetAllEnteries,
     GetSingleEntery,   
-    GetPatientByToken
+    GetPatientDeatils
 }
