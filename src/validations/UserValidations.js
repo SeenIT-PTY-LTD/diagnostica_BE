@@ -4,12 +4,26 @@ const RegistrationValidation = {
     body : Joi.object({
         firstName : Joi.string().required(),
         lastName : Joi.string().required(),
-        password : Joi.string().required(),
+        // password : Joi.string().required(),
         phone : Joi.string().required(),
         countryCode : Joi.string().required(),
-        email : Joi.string().required()
+        email : Joi.string().required(),
+        medicareNumber : Joi.string().required(),
+        genderSpecificCare : Joi.boolean().required(),
+        hospitals : Joi.string(),
+        location : Joi.string(),
+        pediatricSpecialist : Joi.boolean(),
+        specialization : Joi.string()
     })
 } 
+
+
+
+
+
+
+
+
 
 const Login ={
     body : Joi.object({
@@ -67,7 +81,10 @@ const idParamsModel = {
 const GetAllEnteries = {
     query : Joi.object({
        search : Joi.string(),
-       searchCriteria : Joi.string()
+       searchCriteria : Joi.string(),
+       role : Joi.string(),
+       page : Joi.string(),
+       size : Joi.string()
     })
 }
 

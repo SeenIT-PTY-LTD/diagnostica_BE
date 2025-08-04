@@ -10,14 +10,13 @@ const RegistrationValidation ={
         dob : Joi.string().required(),
         gender : Joi.string().required(),
         email : Joi.string().required(),
-        bmi : Joi.string(),
-        country : Joi.string(),
-        urn : Joi.string(),
-        height : Joi.string(),
-        weight : Joi.string(),
-        address : Joi.string(),
-        state : Joi.string(),
-        postcode : Joi.string(),
+        country : Joi.string().allow("",null),
+        urn : Joi.string().allow("",null),
+        height : Joi.string().allow("",null),
+        weight : Joi.string().allow("",null),
+        address : Joi.string().allow("",null),
+        state : Joi.string().allow("",null),
+        postcode : Joi.string().allow("",null),
         // token : Joi.string().required()
     })
 } 
@@ -31,7 +30,8 @@ const Login ={
 
 const VerifyPhone ={
     body : Joi.object({
-        phone : Joi.string().required()
+        phone : Joi.string().required(),
+        countryCode : Joi.string().required()
     })
 } 
 

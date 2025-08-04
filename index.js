@@ -16,7 +16,7 @@ const SectionRoute = require('./src/routes/SectionRoute.js')
 const SubSectionRoute = require('./src/routes/SubSectionRoute.js')
 const BodyPartRoute = require('./src/routes/BodyPartsRoute.js')
 const QuestionRoute = require('./src/routes/QuestionRoute.js')
-const PatientsPromtsRoute = require('./src/routes/PatientPromtsRoute.js')
+const PatientsPromptRoute = require('./src/routes/PatientPromtsRoute.js')
 const DiagnosticsRoute = require('./src/routes/DiagnosticsRoute.js')
 const appointmentRoute = require('./src/routes/AppoinmentRoute.js')
 
@@ -42,7 +42,7 @@ db.once('open', () => {
 });
   
 // middleware
-// app.use(AuthMiddleware)
+app.use(AuthMiddleware)
 
 // regiter routes
 app.use(TestRoute);
@@ -53,7 +53,7 @@ app.use('/section',SectionRoute)
 app.use('/sub-section',SubSectionRoute)
 app.use('/body-part', BodyPartRoute)
 app.use('/question', QuestionRoute)
-app.use('/promts',PatientsPromtsRoute)
+app.use('/prompt',PatientsPromptRoute)
 app.use('/diagnostics',DiagnosticsRoute)
 app.use('/appointment',appointmentRoute)
 

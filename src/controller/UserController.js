@@ -34,6 +34,8 @@ async function CreateEntery( req ,res ){
             return res.status(response.statusCode).send(response)
         }
 
+        req.body.password = await Encryption.randomKey();
+        req.body.secretKey = await Encryption.randomKey();
         req.body.password = await Encryption.encrypt(req.body.password);
         response = await UserCommanCrud.creatEntery(req.body);
 
@@ -110,6 +112,7 @@ async function Varify( req ,res ){
 
     try {
 
+        console.log(req.body,'***body')
         response = await UserCommanCrud.getEnteryBasedOnCondition(req.body);
 
         if( !response['isSuccess'] ){
@@ -243,6 +246,8 @@ async function GetAuthInfo( req ,res ){
     let response
 
     try {
+
+        console.log(req.user,'*****req.user')
 
         response = await UserCommanCrud.getSingleEntery( req.user.id );
 

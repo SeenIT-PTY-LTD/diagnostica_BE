@@ -55,10 +55,6 @@ const schema = new mongoose.Schema({
         type: String,
         default:""
     },
-    bmi : {
-        type: String,
-        default:""
-    },
     country : {
         type: String,
         default:""
@@ -73,6 +69,9 @@ const schema = new mongoose.Schema({
     postcode : {
         type : String
     },
+    secretKey : {
+        type : String
+    }
  
 },{ timestamps : true });
 

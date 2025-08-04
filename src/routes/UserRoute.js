@@ -21,6 +21,7 @@ UserRouter.post('/check-exist',validate(Validations.VerifyPhone), UserController
 // verify email
 UserRouter.get('/get-dashboard-counts', UserController.GetUserDashboardCounts)
 
+UserRouter.get('/auth/info',  UserController.GetAuthInfo)
 // update user by id
 UserRouter.put('/:id',validate(Validations.Update), UserController.UpdateEntery);
 
@@ -33,6 +34,6 @@ UserRouter.get('/:id',validate(Validations.idParamsModel), UserController.GetSin
 // get all user
 UserRouter.get('/',validate(Validations.GetAllEnteries), UserController.GetAllEnteries);
 
-UserRouter.get('/auth/info',  UserController.GetAuthInfo)
+
 
 module.exports = UserRouter;
