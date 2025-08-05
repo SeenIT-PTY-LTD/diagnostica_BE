@@ -18,6 +18,9 @@ const schema = new Schema({
     },
     patientPromtIds : {
         type : []
+    },
+    bodyPartId : {
+        type : String
     }
 },{ timestamps : true }
 );

@@ -53,12 +53,39 @@ async function GetSectionAttemptedData( req ,res ){
         const {  appointmentRefId , sectionId } = req.query;
         
         response = await PatientPromtCommanCrud.getEnteryBasedOnCondition({ appointmentRefId: appointmentRefId });
+
+        console.log('resposse', response)
         
         if(response.isSuccess && response.result.length){
             
-            let sectionData = await GetSectionAttemptedDataByDate( response.result , sectionId )
+            // let sectionData = await GetSectionAttemptedDataByDate( response.result , sectionId )
+
+            let sectionData 
+
+            let sections = response.result[0]['sections']
+
+            sections.forEach(section => {
+                
+                if(section._id.toString() == sectionId.toString()){
+                    
+                    sectionData = section
+                }
+
+            });
+
+            let questions = []
+
+            if(!sectionData){
+                response = Response.sendResponse( true, StatusCodes.NOT_FOUND , "No data found" , {})
+                return res.status(response.statusCode).send(response) 
+            }
+
+            sectionData.subSections[0]['data'].forEach( data => {
+                console.log('=======================data', ...data['questions'])
+                questions = [...questions, ...data['questions']]
+            })
             
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,  sectionData )
+            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,  questions )
 
         }
 
@@ -72,48 +99,48 @@ async function GetSectionAttemptedData( req ,res ){
 }
 
 
-function GetSectionAttemptedDataByDate(data,sectionId) {
-    console.log()
-    const sectionByDate = {};
+// function GetSectionAttemptedDataByDate(data,sectionId) {
+//     console.log()
+//     const sectionByDate = {};
 
-    data.forEach((entery) =>{
+//     data.forEach((entery) =>{
 
-     entery.sections.forEach(section => {
+//      entery.sections.forEach(section => {
 
-        console.log(section)
-        if( section._id.toString() == sectionId ){
+//         console.log(section)
+//         if( section._id.toString() == sectionId ){
 
-            section.subSections.forEach(subSection => {
+//             section.subSections.forEach(subSection => {
 
-                const date = new Date(subSection.createdAt);
-                const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+//                 const date = new Date(subSection.createdAt);
+//                 const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
 
-                subSection.data.forEach(block => {
+//                 subSection.data.forEach(block => {
 
-                    if (block.questions) {
+//                     if (block.questions) {
 
-                        block.questions.forEach(question => {
+//                         block.questions.forEach(question => {
                             
-                            if(!sectionByDate[formattedDate]){
-                                sectionByDate[formattedDate] = []
-                            }
-                            sectionByDate[formattedDate].push(question);
+//                             if(!sectionByDate[formattedDate]){
+//                                 sectionByDate[formattedDate] = []
+//                             }
+//                             sectionByDate[formattedDate].push(question);
                             
-                        });
-                    }
-                });
+//                         });
+//                     }
+//                 });
 
-            });
-        }
+//             });
+//         }
        
-    });
-   })
+//     });
+//    })
   
-  return Object.keys(sectionByDate).map(date => ({
-    date,
-    media: sectionByDate[date]
-  }));
-}
+//   return Object.keys(sectionByDate).map(date => ({
+//     date,
+//     media: sectionByDate[date]
+//   }));
+// }
 
 
 
