@@ -4,7 +4,7 @@ const RegistrationValidation = {
     body : Joi.object({
         firstName : Joi.string().required(),
         lastName : Joi.string().required(),
-        // password : Joi.string().required(),
+        password : Joi.string().required(),
         phone : Joi.string().required(),
         countryCode : Joi.string().required(),
         email : Joi.string().required(),

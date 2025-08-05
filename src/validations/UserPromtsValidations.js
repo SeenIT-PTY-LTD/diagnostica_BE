@@ -18,7 +18,7 @@ const GetSectionMetadata ={
 const UpdateSubSectionPrompt ={
    
     body : Joi.object({
-      patientPromtId : Joi.string().required(),
+      patientPromptId : Joi.string().required(),
       sectionId : Joi.string().required(),
       sectionData : Joi.object().required()
     })

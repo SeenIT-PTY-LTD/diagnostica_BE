@@ -32,7 +32,7 @@ const GetAllEnteries = {
 
 const GetSectionAttemptedData = {
     query : Joi.object({
-        appointmentIdRefId : Joi.string().required(),
+        appointmentRefId : Joi.string().required(),
         sectionId : Joi.string().required()
     })
 }

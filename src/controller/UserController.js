@@ -34,7 +34,6 @@ async function CreateEntery( req ,res ){
             return res.status(response.statusCode).send(response)
         }
 
-        req.body.password = await Encryption.randomKey();
         req.body.secretKey = await Encryption.randomKey();
         req.body.password = await Encryption.encrypt(req.body.password);
         response = await UserCommanCrud.creatEntery(req.body);
@@ -141,7 +140,7 @@ async function GetUserDashboardCounts( req ,res ){
 
     try {
 
-        response = await UserCommanCrud.getCount(req.body);
+        response = await UserCommanCrud.getCount({ isActive : true });
 
         if( !response['isSuccess'] ){
             return res.status(response.statusCode).send(response)
@@ -149,7 +148,7 @@ async function GetUserDashboardCounts( req ,res ){
 
         const doctorCount = response.result.count;
 
-        response = await PatientCommanCrud.getCount(req.body);
+        response = await PatientCommanCrud.getCount({ isActive : true });
 
         if( !response['isSuccess'] ){
             return res.status(response.statusCode).send(response)

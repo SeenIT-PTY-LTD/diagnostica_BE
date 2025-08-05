@@ -20,7 +20,8 @@ const AuthMiddleware = async(req, res, next) => {
     { method: "POST", path: "/user/login" },
     { method: "POST", path: "/user/varify-email" },
     { method: "POST", path: "/user/forgot-password" },
-    { method: "PUT",  path: "/user/reset-password" }
+    { method: "PUT",  path: "/user/reset-password" },
+   
   ];
 
   // Check if route is exempted
@@ -31,7 +32,11 @@ const AuthMiddleware = async(req, res, next) => {
   if (isExempted ) {
     return next();
   }
-  
+
+  if( req.path.includes('/footAndAnkle')){
+    return next()
+  }
+
   // Extract token from headers
   const token = req.header('Authorization')
 
@@ -76,10 +81,10 @@ const AuthMiddleware = async(req, res, next) => {
 
       const user = response.result[0];
 
-      if(user['secretKey'] != secretKey ){
-        let response = Response.sendResponse( false , 401 ,'Session expired', {})
-        return res.status(response.statusCode).json(response);
-      }
+      // if(user['secretKey'] != secretKey ){
+      //   let response = Response.sendResponse( false , 401 ,'Session expired', {})
+      //   return res.status(response.statusCode).json(response);
+      // }
       req.user = user; 
 
     }
