@@ -495,6 +495,37 @@ function getSubSectionByDate(data, subSectionId) {
     return result
 }
 
+async function getPatientPromptByBodyPart(req, res) {
+    let response;
+
+    try {
+        const patientId = req.user._id.toString(); // or req.user.patientId depending on your setup
+        console.log("patientId",patientId);
+        
+        const { bodyPartId } = req.query; // or req.body / req.params
+
+        if (!bodyPartId) {
+            return res.status(StatusCodes.BAD_REQUEST).send(
+                Response.sendResponse(false, StatusCodes.BAD_REQUEST, "Missing bodyPartId", {})
+            );
+        }
+
+        let condition = {
+            patientId : patientId,
+            bodyPartId: bodyPartId
+        }
+
+        console.log(condition,'***condition')
+        const data = await PatientsPromptsCommonCrud.getEnteryBasedOnCondition( condition )
+        console.log("data",data)
+
+        response = Response.sendResponse(true, StatusCodes.OK, "Patient prompt fetched successfully", data || {});
+    } catch (error) {
+        response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
+    }
+
+    return res.status(response.statusCode).send(response);
+}
 
 
 
@@ -507,5 +538,6 @@ module.exports = {
   CreateNewPatientPromts,
   AssignPromtByDoctor,
   UploadImg,
-  GetPromtsByBodypart
+  GetPromtsByBodypart,
+  getPatientPromptByBodyPart
 }

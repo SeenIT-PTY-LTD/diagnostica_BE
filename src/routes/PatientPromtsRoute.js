@@ -20,6 +20,7 @@ const upload = multer({ storage });
 
 // registor patient
 Router.get('/get-by-body-part',validate(Validations.GetPromtsByBodypart), controller.GetPromtsByBodypart);
+Router.get('/patient-prompt/by-body-part', controller.getPatientPromptByBodyPart);
 
 // registor patient
 Router.get('/get-body-part-data',validate(Validations.GetBodyPartPromtMetadata), controller.GetSectionsMetadata);
