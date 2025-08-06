@@ -196,6 +196,12 @@ const schema = new mongoose.Schema({
     },
     profileImage: {
         type: String,
+    },
+    isVerified:{
+        type: Boolean
+    },
+    activationToken:{
+        type: String
     }
 
 }, { timestamps: true });

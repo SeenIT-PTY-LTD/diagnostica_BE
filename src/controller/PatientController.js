@@ -9,6 +9,8 @@ const { encryptObject, decryptString, DefaultencryptObject, decryptObject, defau
 const config = require('../config/config');
 const PatientPromptsModel = require("../models/PatientsPromtsModel");
 const Constats = require("../utils/Constants");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 //common crud 
 const PatientCommonCrud = new CommonCrud(PatientModel)
@@ -37,47 +39,107 @@ let patientFilds = [
 ]
 
 
-async function Registration( req ,res ){
+const transporter = nodemailer.createTransport({
+  host: "smtpout.secureserver.net",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "info@diagnostica.app",
+    pass: "Info@Diag@2052",
+  },
+});
 
-    let response
+async function Registration(req, res) {
+  let response;
 
-    try {
+  try {
+    const checkEmail = await PatientCommonCrud.getEnteryBasedOnCondition({
+      email: req.body.email,
+      isActive: true,
+    });
 
-        const checkEmail = await PatientCommonCrud.getEnteryBasedOnCondition({ email : req.body.email , isActive : true })
-
-        if(checkEmail['isSuccess'] && checkEmail['result'].length){
-            response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Email is alrady present" , {} )
-            return res.status(response.statusCode).send(response)
-        }
-        const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone , countryCode : req.body.countryCode , isActive : true })
-
-        if(checkPhone ['isSuccess'] && checkPhone['result'].length){
-            response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Phone is alrady present" , {} )
-            return res.status(response.statusCode).send(response)
-        }
-
-        req.body.password = await Encryption.encrypt(req.body.password);
-        req.body.secretKey = await Encryption.randomKey()
-        response = await PatientCommonCrud.creatEntery(req.body);
-
-        if(response.isSuccess){
-            response = Response.sendResponse( true, StatusCodes.OK , "patient registration sucessfully" , {} )
-            console.log(response,'******response')
-            // let resBody = await DefaultEncryptObject( response )
-            // console.log('***resbody',resBody)
-            return res.status(response.statusCode).send(response)
-        }
-
-    } catch (error) {
-    
-        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
-
+    if (checkEmail.isSuccess && checkEmail.result.length) {
+      response = Response.sendResponse(false, StatusCodes.NOT_ACCEPTABLE, "Email is already present", {});
+      return res.status(response.statusCode).send(response);
     }
 
-    return res.status(response.statusCode).send(response)
+    const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({
+      phone: req.body.phone,
+      countryCode: req.body.countryCode,
+      isActive: true,
+    });
 
+    if (checkPhone.isSuccess && checkPhone.result.length) {
+      response = Response.sendResponse(false, StatusCodes.NOT_ACCEPTABLE, "Phone is already present", {});
+      return res.status(response.statusCode).send(response);
+    }
+
+    const activationToken = crypto.randomBytes(32).toString("hex");
+
+    req.body.secretKey = "12345";
+    req.body.activationToken = activationToken;
+    req.body.isVerified = false;
+
+    response = await PatientCommonCrud.creatEntery(req.body);
+
+    if (response.isSuccess) {
+      const activationLink = `http://localhost:3000/activate?token=${activationToken}`;
+
+      const mailOptions = {
+        from: "info@diagnostica.app",
+        to: req.body.email,
+        subject: "Activate your Diagnostica account",
+        html: `
+          <p>Thank you for registering on Diagnostica.</p>
+          <p>Please click the button below to verify your account:</p>
+          <button href="${activationLink}" style="
+              display: inline-block;
+              padding: 10px 20px;
+              font-size: 16px;
+              color: white;
+              background-color: #007bff;
+              border-radius: 5px;
+              text-decoration: none;
+              margin-top: 10px;
+          ">Click here to activate</button>
+          <p>If the button doesn't work, copy and paste this URL into your browser:</p>
+          <p>${activationLink}</p>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      response = Response.sendResponse(true, StatusCodes.OK, "Patient registered successfully. Activation email sent.", {});
+      return res.status(response.statusCode).send(response);
+    }
+
+  } catch (error) {
+    response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
+    return res.status(response.statusCode).send(response);
+  }
 }
 
+async function ActivatePatient(req, res) {
+  const token = req.query.token;
+
+  if (!token) {
+    return res.status(400).json({ message: "Invalid or missing token." });
+  }
+
+  const patient = await PatientCommonCrud.getEnteryBasedOnCondition({
+    activationToken: token,
+    isVerified: false,
+  });
+  console.log("patient",patient);
+  
+
+  await PatientCommonCrud.updateEntery(
+    { _id: patient.result[0]._id },
+    { isVerified: true, activationToken: null }
+  );
+
+  return res.status(200).json({ message: "Your account has been activated successfully!" });
+}
 
 async function Login( req ,res ){
 
@@ -428,6 +490,7 @@ async function GetSingleEntery( req ,res ){
 
 module.exports = {
     Registration,
+    ActivatePatient,
     Login,
     VerifyPhone,
     UpdateEntery,
