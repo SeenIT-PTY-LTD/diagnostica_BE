@@ -259,6 +259,38 @@ async function UpdateEntery( req ,res ){
 
 }
 
+async function UpdateProfileImage(req, res) {
+    let response;
+
+    try {
+        // Check if image was uploaded
+        if (!req.file) {
+            response = Response.sendResponse(false, StatusCodes.BAD_REQUEST, 'No image file uploaded', {});
+            return res.status(response.statusCode).send(response);
+        }
+
+        const patientId = req.params.id;
+
+        // Fetch current user entry to remove old image if exists
+        const existing = await PatientCommonCrud.getEnteryBasedOnCondition({ _id: patientId });
+
+        if (!existing.isSuccess || !existing.result.length) {
+            response = Response.sendResponse(false, StatusCodes.NOT_FOUND, 'User not found', {});
+            return res.status(response.statusCode).send(response);
+        }
+
+        // Update image path in database
+        const imagePath = `/img/${req.file.filename}`; // Save relative path
+
+        response = await PatientCommonCrud.updateEntery(patientId, { profileImage: imagePath });
+
+    } catch (error) {
+        response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
+    }
+
+    return res.status(response.statusCode).send(response);
+}
+
 async function ResetPasswordByEmail( req ,res ){
 
     let response
@@ -399,6 +431,7 @@ module.exports = {
     Login,
     VerifyPhone,
     UpdateEntery,
+    UpdateProfileImage,
     ResetPasswordByEmail,
     ResetPasswordByPhone,
     DeleteEntery,

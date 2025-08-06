@@ -194,6 +194,9 @@ const schema = new mongoose.Schema({
         type: Array,
         default: []
     },
+    profileImage: {
+        type: String,
+    }
 
 }, { timestamps: true });
 

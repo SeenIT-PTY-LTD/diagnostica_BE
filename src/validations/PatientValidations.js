@@ -55,6 +55,7 @@ const Update = {
         postcode: Joi.string(),
         patientCode: Joi.string(),
         medicareNumber: Joi.string(),
+        profileImage: Joi.string(),
         //Patient details
         medicalCard: Joi.string(),
         personId: Joi.string(),
