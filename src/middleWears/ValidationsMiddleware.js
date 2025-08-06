@@ -5,10 +5,10 @@ const { StatusCodes } = require("../utils/StatusCodes");
 exports.validate = (schema) => (req, res, next) => {   
   
 
-  if( !Object.keys(req.body).length && ( req.method == "PATCH" || req.method == "PUT" || req.method == "POST" )){
-    let response = Response.sendResponse(false , StatusCodes.NOT_ACCEPTABLE ,"Payload should not be empty", {})
-    return res.status(response.statusCode).send(response);
-  }  
+  // if( !Object.keys(req.body).length && ( req.method == "PATCH" || req.method == "PUT" || req.method == "POST" )){
+  //   let response = Response.sendResponse(false , StatusCodes.NOT_ACCEPTABLE ,"Payload should not be empty", {})
+  //   return res.status(response.statusCode).send(response);
+  // }  
   
   if( Object.keys(req.body).length ){
     

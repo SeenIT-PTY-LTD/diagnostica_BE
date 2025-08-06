@@ -50,15 +50,34 @@ async function GetSectionAttemptedData( req ,res ){
     let response
     try {
 
-        const {  appointmentRefId , sectionId } = req.query;
-        
-        response = await PatientPromtCommanCrud.getEnteryBasedOnCondition({ appointmentRefId: appointmentRefId });
+        const {  appointmentRefId , sectionId ,startDate , endDate} = req.query;
 
-        console.log('resposse', response)
+        let condition = {}
+        condition['appointmentRefId'] = appointmentRefId;
+
+        console.log(startDate,endDate)
+
+        if( startDate && endDate){
+
+            let startSplit = startDate.split('/');
+            let endSplit = endDate.split('/');
+            let startTime = startSplit[2] + "-" + startSplit[1] + '-' + startSplit[0];
+            let endTime = endSplit[2] + "-" + endSplit[1] + '-' + endSplit[0];
+
+            console.log(startTime)
+
+            condition['createdAt'] = {
+                $gte : new Date(startTime),
+                $lte : new Date(endTime)
+            }
+        }
+        
+
+        response = await PatientPromtCommanCrud.getEnteryBasedOnCondition(condition);
 
         let result = []
         
-        if(response.isSuccess && response.result.length){
+        if( response.result.length){
             
             // let sectionData = await GetSectionAttemptedDataByDate( response.result , sectionId )
 
@@ -100,6 +119,9 @@ async function GetSectionAttemptedData( req ,res ){
             }
             
             response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,  result )
+
+        }else{
+            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , [] )
 
         }
 
