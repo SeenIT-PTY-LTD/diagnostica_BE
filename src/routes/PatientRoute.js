@@ -37,7 +37,7 @@ Router.put('/reset-password-by-phone',decryptReqMiddleware, validate(Validations
 Router.put('/reset-password-by-email',validate(Validations.ResetPasswordByEmail), PatientController.ResetPasswordByEmail);
 
 // update patient by id
-Router.put('/:id',validate(Validations.Update), PatientController.UpdateEntery);
+Router.put('/',validate(Validations.Update), PatientController.UpdateEntery);
 
 //update patient profile image
 Router.put('/update-profile-image/:id', upload.single('image'), PatientController.UpdateProfileImage);
@@ -45,10 +45,17 @@ Router.put('/update-profile-image/:id', upload.single('image'), PatientControlle
 // delete patient by id
 Router.delete('/', PatientController.DeleteEntery);
 
+// reset password with token
+Router.put('/reset-password', decryptReqMiddleware , validate(Validations.ResetPassword), PatientController.ResetPasswordWithToken )
+
+Router.post('/logout', PatientController.Logout)
+
 // get single patient
 Router.get('/:id',validate(Validations.idParamsModel), PatientController.GetSingleEntery);
 
 // get all patients
 Router.get('/',validate(Validations.GetAllEnteries), PatientController.GetAllEnteries);
+
+Router.post('/token', PatientController.CreateToken)
 
 module.exports = Router;

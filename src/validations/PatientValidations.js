@@ -172,6 +172,12 @@ const GetAllEnteries = {
     }),
 };
 
+const ResetPassword = {
+    body : Joi.object({
+        password : Joi.string().required()
+    })
+}
+
 module.exports = {
     RegistrationValidation,
     Login,
@@ -181,4 +187,5 @@ module.exports = {
     ResetPasswordByPhone,
     idParamsModel,
     GetAllEnteries,
+    ResetPassword
 };

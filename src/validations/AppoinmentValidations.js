@@ -33,7 +33,9 @@ const GetAllEnteries = {
 const GetSectionAttemptedData = {
     query : Joi.object({
         appointmentRefId : Joi.string().required(),
-        sectionId : Joi.string().required()
+        sectionId : Joi.string().required(),
+        startDate : Joi.string(),
+        endDate : Joi.string()
     })
 }
 

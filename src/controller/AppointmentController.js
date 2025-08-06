@@ -50,42 +50,78 @@ async function GetSectionAttemptedData( req ,res ){
     let response
     try {
 
-        const {  appointmentRefId , sectionId } = req.query;
-        
-        response = await PatientPromtCommanCrud.getEnteryBasedOnCondition({ appointmentRefId: appointmentRefId });
+        const {  appointmentRefId , sectionId ,startDate , endDate} = req.query;
 
-        console.log('resposse', response)
+        let condition = {}
+        condition['appointmentRefId'] = appointmentRefId;
+
+        console.log(startDate,endDate)
+
+        if( startDate && endDate){
+
+            let startSplit = startDate.split('/');
+            let endSplit = endDate.split('/');
+            let startTime = startSplit[2] + "-" + startSplit[1] + '-' + startSplit[0];
+            let endTime = endSplit[2] + "-" + endSplit[1] + '-' + endSplit[0];
+
+            console.log(startTime)
+
+            condition['createdAt'] = {
+                $gte : new Date(startTime),
+                $lte : new Date(endTime)
+            }
+        }
         
-        if(response.isSuccess && response.result.length){
+
+        response = await PatientPromtCommanCrud.getEnteryBasedOnCondition(condition);
+
+        let result = []
+        
+        if( response.result.length){
             
             // let sectionData = await GetSectionAttemptedDataByDate( response.result , sectionId )
 
             let sectionData 
 
-            let sections = response.result[0]['sections']
+            for( let i = 0; i < response.result.length; i++){
 
-            sections.forEach(section => {
-                
-                if(section._id.toString() == sectionId.toString()){
+                let sections = response.result[i]['sections']
+                const date = response.result[i]['createdAt']
+             
+                const formatted = `${String(date.getDate()).padStart(2, '0')}/${
+                String(date.getMonth() + 1).padStart(2, '0')}/${
+                date.getFullYear()}`;
+
+                sections.forEach(section => {
                     
-                    sectionData = section
+                    if(section._id.toString() == sectionId.toString()){
+                        
+                        sectionData = section
+                    }
+
+                });
+
+                let questions = []
+
+                if(!sectionData){
+                    response = Response.sendResponse( true, StatusCodes.NOT_FOUND , "No data found" , {})
+                    return res.status(response.statusCode).send(response) 
                 }
 
-            });
+                sectionData.subSections[0]['data'].forEach( data => {
+                    questions = [...questions, ...data['questions']]
+                })
 
-            let questions = []
-
-            if(!sectionData){
-                response = Response.sendResponse( true, StatusCodes.NOT_FOUND , "No data found" , {})
-                return res.status(response.statusCode).send(response) 
+                let object = {};
+                object['date'] = formatted;
+                object['data'] = questions
+                result.push(object)
             }
-
-            sectionData.subSections[0]['data'].forEach( data => {
-                console.log('=======================data', ...data['questions'])
-                questions = [...questions, ...data['questions']]
-            })
             
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,  questions )
+            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,  result )
+
+        }else{
+            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , [] )
 
         }
 

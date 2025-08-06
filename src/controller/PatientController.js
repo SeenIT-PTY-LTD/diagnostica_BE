@@ -119,6 +119,7 @@ async function Login( req ,res ){
 
             if(token['status']){
 
+                console.log(token['result'] ,'*****token***')
                 response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, {  authToken : token['result'] } )
                 let resBody = await DefaultEncryptObject(response)
                 return res.status(StatusCodes.OK).send(resBody)
@@ -218,12 +219,14 @@ async function UpdateEntery( req ,res ){
 
     try {
 
+        let patientId = req.user._id.toString();
+
         if( req.body.phone){
             response = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone })
 
             if(response.isSuccess && response.result.length){
 
-                if( response.result[0]['_id'].toString() != req.params.id.toString() ){
+                if( response.result[0]['_id'].toString() != patientId ){
                     response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , CustumMessages.PATIENT_ALREADY_EXIST_WITH_SAME_MOBILE , {} )
                     return res.status(response.statusCode).send(response)
 
@@ -239,7 +242,7 @@ async function UpdateEntery( req ,res ){
 
              if(response.isSuccess && response.result.length){
 
-                if( response.result[0]['_id'].toString() != req.params.id.toString() ){
+                if( response.result[0]['_id'].toString() != patientId ){
                     response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , CustumMessages.PATIENT_ALREADY_EXIST_WITH_SAME_EMAIL , {} )
                     return res.status(response.statusCode).send(response)
 
@@ -248,7 +251,7 @@ async function UpdateEntery( req ,res ){
             }
         }
        
-        response = await PatientCommonCrud.updateEntery(req.params.id, req.body);
+        response = await PatientCommonCrud.updateEntery( patientId, req.body);
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
@@ -269,7 +272,7 @@ async function UpdateProfileImage(req, res) {
             return res.status(response.statusCode).send(response);
         }
 
-        const patientId = req.params.id;
+        const patientId = req.user._id.toString();
 
         // Fetch current user entry to remove old image if exists
         const existing = await PatientCommonCrud.getEnteryBasedOnCondition({ _id: patientId });
@@ -372,7 +375,6 @@ async function DeleteEntery( req ,res ){
     try {
 
         response = await PatientCommonCrud.updateEntery( req.user._id.toString(), { isActive : false} );
-        console.log(response)
 
     } catch (error) {
         console.log(error)
@@ -383,6 +385,28 @@ async function DeleteEntery( req ,res ){
     return res.status(response.statusCode).send(response)
 
 }
+
+async function Logout( req ,res ){
+
+    let response
+
+    try {
+
+        response = await PatientCommonCrud.updateEntery( req.user._id.toString(), {  secretKey : null } );
+
+        if(response.isSuccess){
+            response = Response.sendResponse( false, StatusCodes.OK , "Patient logout successfully" , {} )
+        }
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        
+    }
+
+    return res.status(response.statusCode).send(response)
+
+}
+
 
 
 async function GetAllEnteries( req ,res ){
@@ -398,6 +422,28 @@ async function GetAllEnteries( req ,res ){
         if(req.query.role) condition['role'] = req.query.role
 
         response = await PatientCommonCrud.getAllEnteries(req.query ,condition );
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        
+    }
+
+    return res.status(response.statusCode).send(response)
+
+}
+
+async function ResetPasswordWithToken( req ,res ){
+
+    let response
+
+    try {
+
+        let password = await Encryption.encrypt(req.body.password)
+
+        response = await PatientCommonCrud.updateEntery( req.user._id.toString() , { password : password });
+
+        if(response.isSuccess)
+            response = Response.sendResponse( true, StatusCodes.OK , "Reset password successfully" , {} )
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
@@ -425,6 +471,23 @@ async function GetSingleEntery( req ,res ){
 
 }
 
+async function CreateToken( req ,res ){
+
+    let response
+
+    try {
+
+        response = await DefaultEncryptObject(req.body);
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        
+    }
+
+    return res.status(200).send(response)
+
+}
+
 
 module.exports = {
     Registration,
@@ -437,5 +500,8 @@ module.exports = {
     DeleteEntery,
     GetAllEnteries,
     GetSingleEntery,   
-    GetPatientDeatils
+    GetPatientDeatils,
+    Logout,
+    ResetPasswordWithToken,
+    CreateToken
 }
