@@ -55,6 +55,8 @@ async function GetSectionAttemptedData( req ,res ){
         response = await PatientPromtCommanCrud.getEnteryBasedOnCondition({ appointmentRefId: appointmentRefId });
 
         console.log('resposse', response)
+
+        let result = []
         
         if(response.isSuccess && response.result.length){
             
@@ -62,30 +64,42 @@ async function GetSectionAttemptedData( req ,res ){
 
             let sectionData 
 
-            let sections = response.result[0]['sections']
+            for( let i = 0; i < response.result.length; i++){
 
-            sections.forEach(section => {
-                
-                if(section._id.toString() == sectionId.toString()){
+                let sections = response.result[i]['sections']
+                const date = response.result[i]['createdAt']
+             
+                const formatted = `${String(date.getDate()).padStart(2, '0')}/${
+                String(date.getMonth() + 1).padStart(2, '0')}/${
+                date.getFullYear()}`;
+
+                sections.forEach(section => {
                     
-                    sectionData = section
+                    if(section._id.toString() == sectionId.toString()){
+                        
+                        sectionData = section
+                    }
+
+                });
+
+                let questions = []
+
+                if(!sectionData){
+                    response = Response.sendResponse( true, StatusCodes.NOT_FOUND , "No data found" , {})
+                    return res.status(response.statusCode).send(response) 
                 }
 
-            });
+                sectionData.subSections[0]['data'].forEach( data => {
+                    questions = [...questions, ...data['questions']]
+                })
 
-            let questions = []
-
-            if(!sectionData){
-                response = Response.sendResponse( true, StatusCodes.NOT_FOUND , "No data found" , {})
-                return res.status(response.statusCode).send(response) 
+                let object = {};
+                object['date'] = formatted;
+                object['data'] = questions
+                result.push(object)
             }
-
-            sectionData.subSections[0]['data'].forEach( data => {
-                console.log('=======================data', ...data['questions'])
-                questions = [...questions, ...data['questions']]
-            })
             
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,  questions )
+            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,  result )
 
         }
 
