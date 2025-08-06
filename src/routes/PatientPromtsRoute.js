@@ -31,7 +31,7 @@ Router.put('/update-section-data', validate(Validations.UpdateSubSectionPrompt),
 
 Router.post('/upload-img',upload.single('image'), controller.UploadImg )
 
-Router.get('/user-selected-promt-img',validate(Validations.GetUserSelectedImgPromt), controller.GetUserSelectedPromtsImages);
+Router.post('/add-img-prompt', upload.single('image'),controller.AddImageInprompt);
 
 Router.get('/attempted-sub-sections-by-date',validate(Validations.AttemptedSubSectionByDate), controller.GetUserAttemptedSubSectionPromtsDateWise);
 

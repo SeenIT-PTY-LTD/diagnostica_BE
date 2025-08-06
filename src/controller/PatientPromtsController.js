@@ -258,6 +258,52 @@ async function CreateNewPatientPromts(req,res){
     return res.status(response.statusCode).send(response)
 }
 
+async function AddImageInprompt(req,res){
+     let response
+    try {
+
+        let image = req.file.filename
+
+        response = await PatientsPromptsCommonCrud.getSingleEntery(req.body.patientPromptId);
+
+        let data =  JSON.parse( JSON.stringify(response.result[0]))
+
+        data.sections.forEach(section => {
+
+            if (section.sectionCode === "Images") {
+                
+                section.subSections.forEach(subSection => {
+
+                subSection.data.forEach(item => {
+
+                    item.questions.forEach(question => {
+
+                    if (question.media && Array.isArray(question.media)) {
+                       
+                            question.img = image
+                        
+                        }
+                    });
+                });
+                });
+            }
+        });
+
+        
+        response = await PatientsPromptsCommonCrud.updateEntery( req.body.patientPromptId, data );
+
+        if(response.isSuccess){
+            response = Response.sendResponse( true, StatusCodes.OK , "Image uploaded successfully" , {} )
+
+        }
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+
+    }
+    return res.status(response.statusCode).send(response)
+}
+
 async function GetPromtsByBodypart(req,res){
      let response
     try {
@@ -539,5 +585,6 @@ module.exports = {
   AssignPromtByDoctor,
   UploadImg,
   GetPromtsByBodypart,
-  getPatientPromptByBodyPart
+  getPatientPromptByBodyPart,
+  AddImageInprompt
 }
