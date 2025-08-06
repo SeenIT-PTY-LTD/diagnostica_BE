@@ -3,6 +3,20 @@ const PatientController = require('../controller/PatientController');
 const { decryptReqMiddleware } = require('../middleWears/EncryptionMiddleware');
 const { validate } = require('../middleWears/ValidationsMiddleware');
 const Validations = require('../validations/PatientValidations')
+const multer = require('multer')
+const path = require('path')
+
+const storage = multer.diskStorage({
+  destination: "./src/img",
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
+    );
+  },
+});
+
+const upload = multer({ storage });
 
 // registor patient
 Router.post('/registration',decryptReqMiddleware,validate(Validations.RegistrationValidation) , PatientController.Registration);
@@ -24,6 +38,9 @@ Router.put('/reset-password-by-email',validate(Validations.ResetPasswordByEmail)
 
 // update patient by id
 Router.put('/:id',validate(Validations.Update), PatientController.UpdateEntery);
+
+//update patient profile image
+Router.put('/update-profile-image/:id', upload.single('image'), PatientController.UpdateProfileImage);
 
 // delete patient by id
 Router.delete('/', PatientController.DeleteEntery);
