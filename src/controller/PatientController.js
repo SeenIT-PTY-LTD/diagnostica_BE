@@ -9,10 +9,12 @@ const { encryptObject, decryptString, DefaultencryptObject, decryptObject, defau
 const config = require('../config/config');
 const PatientPromptsModel = require("../models/PatientsPromtsModel");
 const Constats = require("../utils/Constants");
+const DiagnosticsModel = require("../models/DiagnosticsModel");
 
 //common crud 
 const PatientCommonCrud = new CommonCrud(PatientModel)
 const PatientPromptsCrud = new CommonCrud(PatientPromptsModel)
+const DiagnosticsCommonCrud = new CommonCrud(DiagnosticsModel)
 
 let patientFilds = [ 
     'firstName',
@@ -47,13 +49,15 @@ async function Registration( req ,res ){
 
         if(checkEmail['isSuccess'] && checkEmail['result'].length){
             response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Email is alrady present" , {} )
-            return res.status(response.statusCode).send(response)
+            let resBody = await DefaultEncryptObject( response )
+            return res.status(response.statusCode).send(resBody)
         }
         const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone , countryCode : req.body.countryCode , isActive : true })
 
         if(checkPhone ['isSuccess'] && checkPhone['result'].length){
             response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Phone is alrady present" , {} )
-            return res.status(response.statusCode).send(response)
+            let resBody = await DefaultEncryptObject( response )
+            return res.status(response.statusCode).send(resBody)
         }
 
         req.body.password = await Encryption.encrypt(req.body.password);
@@ -62,11 +66,10 @@ async function Registration( req ,res ){
 
         if(response.isSuccess){
             response = Response.sendResponse( true, StatusCodes.OK , "patient registration sucessfully" , {} )
-            console.log(response,'******response')
-            // let resBody = await DefaultEncryptObject( response )
-            // console.log('***resbody',resBody)
-            return res.status(response.statusCode).send(response)
         }
+
+        let resBody = await DefaultEncryptObject( response )
+        return res.status(response.statusCode).send(resBody)
 
     } catch (error) {
     
@@ -96,9 +99,7 @@ async function Login( req ,res ){
 
         if( response['isSuccess'] && !response['result'].length ){
             response = Response.sendResponse(false,StatusCodes.UNAUTHORIZED, CustumMessages.USER_NOT_Present, {})
-            console.log(response)
             let resBody = await DefaultEncryptObject(response)
-            console.log(resBody,'*******resBOady')
             return res.status(response.statusCode).send(resBody)
         }
 
@@ -158,8 +159,6 @@ async function GetPatientDeatils( req ,res ){
 
         const patientPromtResponse  = await PatientPromptsCrud.getEnteryBasedOnCondition({ patientId : patientId , status : Constats.STATUS.PENDING ,isFollowUp : false });
 
-        console.log(patientPromtResponse,'******patientPromtResponse*****')
-
         result['promptIds'] =  patientPromtResponse.result.map( promt => promt._id.toString())
 
         const patientPromtFollowUpResponse  = await PatientPromptsCrud.getEnteryBasedOnCondition({ patientId : patientId , status : Constats.STATUS.PENDING ,isFollowUp : true });
@@ -168,7 +167,6 @@ async function GetPatientDeatils( req ,res ){
 
         response = Response.sendResponse(true,StatusCodes.OK, CustumMessages.SUCCESS, result )
 
-        console.log(response,'***response')
         const token = await DefaultEncryptObject( response )
         return res.status(response.statusCode).send(token);
 
@@ -228,8 +226,8 @@ async function UpdateEntery( req ,res ){
 
                 if( response.result[0]['_id'].toString() != patientId ){
                     response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , CustumMessages.PATIENT_ALREADY_EXIST_WITH_SAME_MOBILE , {} )
-                    return res.status(response.statusCode).send(response)
-
+                    let resBody = await DefaultEncryptObject(response)
+                    return res.status(response.statusCode).send(resBody)
                 }
                
 
@@ -244,7 +242,8 @@ async function UpdateEntery( req ,res ){
 
                 if( response.result[0]['_id'].toString() != patientId ){
                     response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , CustumMessages.PATIENT_ALREADY_EXIST_WITH_SAME_EMAIL , {} )
-                    return res.status(response.statusCode).send(response)
+                    let resBody = await DefaultEncryptObject(response)
+                    return res.status(response.statusCode).send(resBody)
 
                 }
 
@@ -252,6 +251,14 @@ async function UpdateEntery( req ,res ){
         }
        
         response = await PatientCommonCrud.updateEntery( patientId, req.body);
+
+        if(response.isSuccess){
+            response.message = "Patient successfully updated"
+        }
+
+        let resBody = await DefaultEncryptObject(response)
+        console.log(response)
+        return res.status(response.statusCode).send(resBody)
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
@@ -491,6 +498,23 @@ async function CreateToken( req ,res ){
 
 }
 
+async function GetPatientDiagnotica( req ,res ){
+
+    let response
+
+    try {
+
+        response = await DiagnosticsCommonCrud.getEnteryBasedOnCondition({patientId : req.user._id.toString(), status : 'Completed'})
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        
+    }
+
+    let resBody = await DefaultEncryptObject(response);
+    return res.status(response.statusCode).send(resBody)
+
+}
 
 module.exports = {
     Registration,
@@ -506,5 +530,6 @@ module.exports = {
     GetPatientDeatils,
     Logout,
     ResetPasswordWithToken,
-    CreateToken
+    CreateToken,
+    GetPatientDiagnotica
 }

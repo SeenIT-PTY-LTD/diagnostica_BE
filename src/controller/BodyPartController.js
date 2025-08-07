@@ -6,6 +6,7 @@ const Response = require("../utils/Response");
 const JWT = require('../utils/JwtAuthToken')
 const { StatusCodes } = require("../utils/StatusCodes");
 const SectionModel = require("../models/SectionModel");
+const { DefaultEncryptObject } = require("../utils/Crypto");
 
 //common crud 
 const BodyPartCommonCrud = new CommonCrud(BodyPartsModel);
@@ -105,7 +106,8 @@ async function GetAllEnteries( req ,res ){
         
     }
 
-    return res.status(response.statusCode).send(response)
+    let resBody = await DefaultEncryptObject(response)
+    return res.status(response.statusCode).send(resBody)
 
 }
 

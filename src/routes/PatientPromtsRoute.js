@@ -1,5 +1,6 @@
 const Router = require('express').Router();
 const controller = require('../controller/PatientPromtsController');
+const { decryptReqMiddleware } = require('../middleWears/EncryptionMiddleware');
 const { validate } = require('../middleWears/ValidationsMiddleware');
 const Validations = require('../validations/UserPromtsValidations')
 const multer = require('multer')
@@ -27,7 +28,7 @@ Router.get('/get-body-part-data',validate(Validations.GetBodyPartPromtMetadata),
 
 Router.get('/get-section-data', validate(Validations.GetSectionMetadata),controller.GetSectionsMetadata);
 
-Router.put('/update-section-data', validate(Validations.UpdateSubSectionPrompt),controller.UpdateSubSectionMetadata);
+Router.put('/update-section-data',decryptReqMiddleware, validate(Validations.UpdateSubSectionPrompt),controller.UpdateSubSectionMetadata);
 
 Router.post('/upload-img',upload.single('image'), controller.UploadImg )
 
@@ -35,7 +36,7 @@ Router.post('/add-img-prompt', upload.single('image'),controller.AddImageInpromp
 
 Router.get('/attempted-sub-sections-by-date',validate(Validations.AttemptedSubSectionByDate), controller.GetUserAttemptedSubSectionPromtsDateWise);
 
-Router.post('/create', validate(Validations.CreatePatientPromt), controller.CreateNewPatientPromts);
+Router.post('/create',decryptReqMiddleware, validate(Validations.CreatePatientPromt), controller.CreateNewPatientPromts);
 
 Router.post('/assign-by-doctor', validate(Validations.AssignByDoctor), controller.AssignPromtByDoctor)
 

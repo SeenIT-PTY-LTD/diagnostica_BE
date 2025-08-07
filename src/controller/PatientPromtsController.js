@@ -8,6 +8,7 @@ const { CustumMessages } = require("../utils/CustumMessages");
 const Response = require("../utils/Response");
 const { StatusCodes } = require("../utils/StatusCodes");
 const Constats = require("../utils/Constants");
+const { DefaultEncryptObject } = require("../utils/Crypto");
 
 //common crud 
 const SectionCommonCrud = new CommonCrud(SectionModel);
@@ -83,9 +84,9 @@ async function UpdateSubSectionMetadata( req ,res ){
         
         const userAttenptedSectionResponse = await PatientsPromptsCommonCrud.getSingleEntery(patientPromptId);
 
-        console.log(userAttenptedSectionResponse,'******userAttenptedSectionResponse')
         if(!userAttenptedSectionResponse.isSuccess){
-            return res.status(userAttenptedSectionResponse.statusCode).send(userAttenptedSectionResponse)
+            let resBody = await DefaultEncryptObject(userAttenptedSectionResponse)
+            return res.status(userAttenptedSectionResponse.statusCode).send(resBody)
         }
 
         const bodyPartId = userAttenptedSectionResponse.result[0]['bodyPartId']
@@ -135,7 +136,6 @@ async function UpdateSubSectionMetadata( req ,res ){
 
         let appointmentRefId
 
-        console.log(totalSectionCount,completedSectionCount)
         if(totalSectionCount == completedSectionCount){
 
             userAttenptedData['status'] = Constats.STATUS.COMPLETED;
@@ -155,10 +155,13 @@ async function UpdateSubSectionMetadata( req ,res ){
             data['patientId'] = userAttenptedData['patientId'];
             data['patientPromtIds'] = [ patientPromptId ]
             
-            response = await AppointmentCommonCrud.creatEntery(data)
-
-            appointmentRefId = response.result[0]['_id'].toString()
+            if(!userAttenptedData['appointmentRefId']){
+                response = await AppointmentCommonCrud.creatEntery(data)
+                appointmentRefId = response.result['_id'].toString()
+            }
+           
         }
+
         userAttenptedData['completedSections'] = completedSectionCount
 
         if(appointmentRefId){
@@ -168,6 +171,7 @@ async function UpdateSubSectionMetadata( req ,res ){
         response = await PatientsPromptsCommonCrud.updateEntery( patientPromptId , userAttenptedData )
         if(response.isSuccess){
             response = await PatientsPromptsCommonCrud.getSingleEntery( patientPromptId  )
+             
         }
 
     } catch (error) {
@@ -175,7 +179,8 @@ async function UpdateSubSectionMetadata( req ,res ){
         
     }
 
-    return res.status(response.statusCode).send(response)
+    let resBody = await DefaultEncryptObject(response)
+    return res.status(response.statusCode).send(resBody)
 }
 
 async function UploadImg( req ,res ){
@@ -208,7 +213,8 @@ async function CreateNewPatientPromts(req,res){
         const sectionResponse = await SectionCommonCrud.getEnteryBasedOnCondition( { bodyPartId : bodyPartId });
 
         if(!sectionResponse.isSuccess){
-            return res.status(sectionResponse.statusCode).send(sectionResponse)
+            const resBody = await DefaultEncryptObject(sectionResponse)
+            return res.status(sectionResponse.statusCode).send(resBody)
         }
 
         if( sectionResponse.result.length ){
@@ -255,13 +261,15 @@ async function CreateNewPatientPromts(req,res){
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
 
     }
-    return res.status(response.statusCode).send(response)
+    const resBody = await DefaultEncryptObject(response)
+    return res.status(response.statusCode).send(resBody)
 }
 
 async function AddImageInprompt(req,res){
      let response
     try {
 
+        console.log(req.file,'================================')
         let image = req.file.filename
 
         response = await PatientsPromptsCommonCrud.getSingleEntery(req.body.patientPromptId);
@@ -315,7 +323,8 @@ async function GetPromtsByBodypart(req,res){
         const sectionResponse = await SectionCommonCrud.getEnteryBasedOnCondition( { bodyPartId : bodyPartId });
 
         if(!sectionResponse.isSuccess){
-            return res.status(sectionResponse.statusCode).send(sectionResponse)
+            let resBody = await DefaultEncryptObject(sectionResponse)
+            return res.status(sectionResponse.statusCode).send(resBody)
         }
 
         if( sectionResponse.result.length ){
@@ -360,7 +369,9 @@ async function GetPromtsByBodypart(req,res){
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
 
     }
-    return res.status(response.statusCode).send(response)
+
+    let resBody = await DefaultEncryptObject(response)
+    return res.status(response.statusCode).send(resBody)
 }
 
 async function AssignPromtByDoctor(req,res){
@@ -551,9 +562,10 @@ async function getPatientPromptByBodyPart(req, res) {
         const { bodyPartId } = req.query; // or req.body / req.params
 
         if (!bodyPartId) {
-            return res.status(StatusCodes.BAD_REQUEST).send(
-                Response.sendResponse(false, StatusCodes.BAD_REQUEST, "Missing bodyPartId", {})
-            );
+
+            response = Response.sendResponse(false, StatusCodes.BAD_REQUEST, "Missing bodyPartId", {})
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(StatusCodes.BAD_REQUEST).send(resBody);
         }
 
         let condition = {
@@ -565,12 +577,14 @@ async function getPatientPromptByBodyPart(req, res) {
         const data = await PatientsPromptsCommonCrud.getEnteryBasedOnCondition( condition )
         console.log("data",data)
 
-        response = Response.sendResponse(true, StatusCodes.OK, "Patient prompt fetched successfully", data || {});
+        response = Response.sendResponse(true, StatusCodes.OK, "Patient prompt fetched successfully", data.result || {});
     } catch (error) {
         response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
     }
 
-    return res.status(response.statusCode).send(response);
+    let resBody = await DefaultEncryptObject(response)
+    return res.status(response.statusCode).send(resBody)
+
 }
 
 

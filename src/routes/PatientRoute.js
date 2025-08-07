@@ -37,10 +37,10 @@ Router.put('/reset-password-by-phone',decryptReqMiddleware, validate(Validations
 Router.put('/reset-password-by-email',validate(Validations.ResetPasswordByEmail), PatientController.ResetPasswordByEmail);
 
 // update patient by id
-Router.put('/',validate(Validations.Update), PatientController.UpdateEntery);
+Router.put('/',decryptReqMiddleware,validate(Validations.Update), PatientController.UpdateEntery);
 
 //update patient profile image
-Router.put('/update-profile-image/:id', upload.single('image'), PatientController.UpdateProfileImage);
+Router.put('/update-profile-image', upload.single('image'), PatientController.UpdateProfileImage);
 
 // delete patient by id
 Router.delete('/', PatientController.DeleteEntery);
@@ -50,6 +50,7 @@ Router.put('/reset-password', decryptReqMiddleware , validate(Validations.ResetP
 
 Router.post('/logout', PatientController.Logout)
 
+Router.get('/diagnotica', PatientController.GetPatientDiagnotica)
 // get single patient
 Router.get('/:id',validate(Validations.idParamsModel), PatientController.GetSingleEntery);
 
@@ -57,5 +58,7 @@ Router.get('/:id',validate(Validations.idParamsModel), PatientController.GetSing
 Router.get('/',validate(Validations.GetAllEnteries), PatientController.GetAllEnteries);
 
 Router.post('/token', PatientController.CreateToken)
+
+
 
 module.exports = Router;
