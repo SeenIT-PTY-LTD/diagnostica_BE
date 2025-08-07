@@ -32,6 +32,7 @@ const idParamsModel = {
 
 const GetAllEnteries = {
     query : Joi.object({
+       filters : Joi.string(),
        search : Joi.string(),
        searchCriteria : Joi.string()
     })

@@ -69,7 +69,7 @@ async function GetAllEnteries( req ,res ){
 
     try {
 
-        response = await DiagnosticsCommonCrud.getAllEnteriesWithoutLimit(req.query);
+        response = await DiagnosticsCommonCrud.getAllEnteries(req.query);
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
