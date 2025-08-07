@@ -21,9 +21,9 @@ const AuthMiddleware = async(req, res, next) => {
     { method: "POST", path: "/user/varify-email" },
     { method: "POST", path: "/user/forgot-password" },
     { method: "PUT",  path: "/user/reset-password" },
-    { method : "POST",path : "/patient/token" }
+    { method : "POST",path : "/patient/token" },
    
-  ];
+  ]
 
   // Check if route is exempted
   const isExempted = exemptedRoutes.some(
@@ -38,8 +38,12 @@ const AuthMiddleware = async(req, res, next) => {
     return next()
   }
 
+  if(!req.header('Authorization')){
+    let response = Response.sendResponse( false , 401 ,'Access denied. No token provided.', {})
+    return res.status(response.statusCode).json(response);
+  }
   // Extract token from headers
-  const token = req.header('Authorization')
+  const token = req.header('Authorization').split(' ')[1];
 
   if (!token) {
     let response = Response.sendResponse( false , 401 ,'Access denied. No token provided.', {})

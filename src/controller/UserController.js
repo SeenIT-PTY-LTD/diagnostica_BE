@@ -212,7 +212,7 @@ async function GetAllEnteries( req ,res ){
 
     try {
 
-        response = await UserCommanCrud.getAllEnteriesWithoutLimit(req.query, { isActive : true });
+        response = await UserCommanCrud.getAllEnteries(req.query, { isActive : true });
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
@@ -245,8 +245,6 @@ async function GetAuthInfo( req ,res ){
     let response
 
     try {
-
-        console.log(req.user,'*****req.user')
 
         response = await UserCommanCrud.getSingleEntery( req.user.id );
 
