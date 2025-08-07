@@ -445,6 +445,9 @@ async function ResetPasswordWithToken( req ,res ){
         if(response.isSuccess)
             response = Response.sendResponse( true, StatusCodes.OK , "Reset password successfully" , {} )
 
+        let resBody = await DefaultEncryptObject(response)
+        return res.status(response.statusCode).send(resBody)
+
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
