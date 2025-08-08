@@ -7,7 +7,7 @@ const schema = new Schema({
     },
     doctorId : {
         type: Schema.Types.ObjectId, 
-        ref: 'bodyParts',
+        ref: 'user',
         required : true
     },
     step : {
@@ -16,7 +16,7 @@ const schema = new Schema({
     },
     patientId : {
         type : String,
-        ref: 'patients',
+        ref: 'patient',
         required : true
     },
     status : {
