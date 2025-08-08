@@ -464,7 +464,7 @@ async function ResetPasswordWithToken( req ,res ){
 
         let password = await Encryption.encrypt(req.body.password)
 
-        response = await PatientCommonCrud.updateEntery({ email : req.body.email , isActive : true}  , { password : password });
+        response = await PatientCommonCrud.updateEnteryBasedOnCondition({ email : req.body.email , isActive : true}  , { password : password });
 
         if(response.isSuccess)
             response = Response.sendResponse( true, StatusCodes.OK , "Reset password successfully" , {} )
@@ -473,6 +473,7 @@ async function ResetPasswordWithToken( req ,res ){
         return res.status(response.statusCode).send(resBody)
 
     } catch (error) {
+        
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
     }
