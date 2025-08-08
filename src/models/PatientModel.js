@@ -22,10 +22,12 @@ const schema = new mongoose.Schema({
         required: true
     },
     medicareNumber: {
-        type: String
+        type: String,
+        default: ""
     },
     urn: {
-        type: String
+        type: String,
+        default: ""
     },
     phone: {
         type: String,
@@ -61,118 +63,156 @@ const schema = new mongoose.Schema({
     },
     isActive: {
         type: Boolean,
-        default: true
+        default: true,
     },
     patientCode: {
-        type: String
+        type: String,
+        default: ""
     },
     postcode: {
-        type: String
+        type: String,
+        default: ""
     },
     secretKey: {
-        type: String
+        type: String,
+        default: ""
     },
     medicalCard: {
-        type: String
+        type: String,
+        default: ""
     },
     personId: {
-        type: String
+        type: String,
+        default: ""
     },
     occupation: {
-        type: String
+        type: String,
+        default: ""
     },
     emergencyContactPerson: {
-        type: String
+        type: String,
+        default: ""
     },
     emergencyContactNumber: {
-        type: String
+        type: String,
+        default: ""
     },
     relationship: {
-        type: String
+        type: String,
+        default: ""
     },
     privateHealthInsurance: {
-        type: String
+        type: String,
+        default: ""
     },
     healthFund: {
         type: String,
+        default: ""
     },
     memberNumber: {
-        type: String
+        type: String,
+        default: ""
     },
     pensionNumber: {
-        type: String
+        type: String,
+        default: ""
     },
     expiryDate: {
         type: String,
+        default: ""
     },
     questionReply: {
         type: String,
+        default: ""
     },
     doctorType: {
         type: String,
+        default: ""
     },
     doctorAddress: {
         type: String,
+        default: ""
     },
     referDoctorNumber: {
         type: String,
+        default: ""
     },
     generalDoctorName: {
         type: String,
+        default: ""
     },
     generaldoctorNumber: {
         type: String,
+        default: ""
     },
     generalDoctorAddress: {
         type: String,
+        default: ""
     },
     physiotherapistName: {
         type: String,
+        default: ""
     },
     physiotherapistNumber: {
         type: String,
+        default: ""
     },
     physiotherapistAddress: {
         type: String,
+        default: ""
     },
     claimNumber: {
         type: String,
+        default: ""
     },
     dateOfInjury: {
         type: String,
+        default: ""
     },
     companyName: {
         type: String,
+        default: ""
     },
     permanentAddress: {
         type: String,
+        default: ""
     },
     contactPersonNameAtWorkplace: {
         type: String,
+        default: ""
     },
     contactPersonFirstName: {
         type: String,
+        default: ""
     },
     contactPersonLastName: {
         type: String,
+        default: ""
     },
+
     insuranceCompanyName: {
         type: String,
+        default: ""
     },
     insuranceCompanyAddress: {
         type: String,
+        default: ""
     },
     managerFirstName: {
         type: String,
+        default: ""
     },
     managerLastName: {
         type: String,
+        default: ""
     },
     managerPhone: {
         type: String,
+        default: ""
     },
     managerEmail: {
         type: String,
+        default: ""
     },
     medicationsFaqs: {
         type: Array,
@@ -196,6 +236,7 @@ const schema = new mongoose.Schema({
     },
     profileImage: {
         type: String,
+        default: ""
     }
 
 }, { timestamps: true });
