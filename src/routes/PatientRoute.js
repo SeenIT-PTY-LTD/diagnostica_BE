@@ -19,8 +19,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // registor patient
-// Router.post('/registration',decryptReqMiddleware,validate(Validations.RegistrationValidation) , PatientController.Registration);
-Router.post('/registration', PatientController.Registration);
+Router.post('/registration',decryptReqMiddleware,validate(Validations.RegistrationValidation) , PatientController.Registration);
 
 // login
 Router.post('/login',decryptReqMiddleware,validate(Validations.Login), PatientController.Login);
