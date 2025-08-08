@@ -21,6 +21,7 @@ const AuthMiddleware = async(req, res, next) => {
     { method: "POST", path: "/user/varify-email" },
     { method: "POST", path: "/user/forgot-password" },
     { method: "PUT",  path: "/user/reset-password" },
+    { method: "PUT",  path: "/patient/reset-password" },
     { method : "POST",path : "/patient/token" },
    
   ]
