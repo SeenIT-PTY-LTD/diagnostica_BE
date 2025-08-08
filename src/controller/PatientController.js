@@ -308,7 +308,8 @@ async function ResetPasswordByEmail( req ,res ){
     try {
 
         const condition = {
-            email : req.body.email
+            email : req.body.email,
+            isActive : true
         }
 
         const password = await Encryption.encrypt(req.body.password)
@@ -447,7 +448,7 @@ async function ResetPasswordWithToken( req ,res ){
 
         let password = await Encryption.encrypt(req.body.password)
 
-        response = await PatientCommonCrud.updateEntery( req.user._id.toString() , { password : password });
+        response = await PatientCommonCrud.updateEntery({ email : req.body.email , isActive : true}  , { password : password });
 
         if(response.isSuccess)
             response = Response.sendResponse( true, StatusCodes.OK , "Reset password successfully" , {} )
