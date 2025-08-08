@@ -306,7 +306,7 @@ async function UpdateProfileImage(req, res) {
         }
 
         // Update image path in database
-        const imagePath = `/img/${req.file.filename}`; // Save relative path
+        const imagePath = `/${req.file.filename}`; // Save relative path
 
         response = await PatientCommonCrud.updateEntery(patientId, { profileImage: imagePath });
 
