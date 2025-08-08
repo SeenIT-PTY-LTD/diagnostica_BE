@@ -3,6 +3,7 @@ const PatientPromtsModel = require("../models/PatientsPromtsModel");
 const SectionModel = require("../models/SectionModel");
 const CommonCrud = require("../services/CommonCrud");
 const { CustumMessages } = require("../utils/CustumMessages");
+const { isNotEmpty } = require("../utils/helpers");
 const Response = require("../utils/Response");
 const { StatusCodes } = require("../utils/StatusCodes");
 
@@ -45,93 +46,98 @@ async function GetSectionsByAppointment( req ,res ){
 }
 
 
-async function GetSectionAttemptedData( req ,res ){
+async function GetSectionAttemptedData(req, res) {
+  let response;
+  try {
+    const { appointmentRefId, sectionId, startDate, endDate } = req.query;
 
-    let response
-    try {
+    let condition = {};
+    condition["appointmentRefId"] = appointmentRefId;
 
-        const {  appointmentRefId , sectionId ,startDate , endDate} = req.query;
+    if (isNotEmpty(startDate) && isNotEmpty(endDate)) {
+      let [startDay, startMonth, startYear] = startDate.trim().split("/");
+      let [endDay, endMonth, endYear] = endDate.trim().split("/");
 
-        let condition = {}
-        condition['appointmentRefId'] = appointmentRefId;
+      let startTime = `${startYear}-${startMonth}-${startDay}`;
+      let endTime = `${endYear}-${endMonth}-${endDay}`;
 
-        console.log(startDate,endDate)
-
-        if( startDate && endDate){
-
-            let startSplit = startDate.split('/');
-            let endSplit = endDate.split('/');
-            let startTime = startSplit[2] + "-" + startSplit[1] + '-' + startSplit[0];
-            let endTime = endSplit[2] + "-" + endSplit[1] + '-' + endSplit[0];
-
-            console.log(startTime)
-
-            condition['createdAt'] = {
-                $gte : new Date(startTime),
-                $lte : new Date(endTime)
-            }
-        }
-        
-
-        response = await PatientPromtCommanCrud.getEnteryBasedOnCondition(condition);
-
-        let result = []
-        
-        if( response.result.length){
-            
-            // let sectionData = await GetSectionAttemptedDataByDate( response.result , sectionId )
-
-            let sectionData 
-
-            for( let i = 0; i < response.result.length; i++){
-
-                let sections = response.result[i]['sections']
-                const date = response.result[i]['createdAt']
-             
-                const formatted = `${String(date.getDate()).padStart(2, '0')}/${
-                String(date.getMonth() + 1).padStart(2, '0')}/${
-                date.getFullYear()}`;
-
-                sections.forEach(section => {
-                    
-                    if(section._id.toString() == sectionId.toString()){
-                        
-                        sectionData = section
-                    }
-
-                });
-
-                let questions = []
-
-                if(!sectionData){
-                    response = Response.sendResponse( true, StatusCodes.NOT_FOUND , "No data found" , {})
-                    return res.status(response.statusCode).send(response) 
-                }
-
-                sectionData.subSections[0]['data'].forEach( data => {
-                    questions = [...questions, ...data['questions']]
-                })
-
-                let object = {};
-                object['date'] = formatted;
-                object['data'] = questions
-                result.push(object)
-            }
-            
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS ,  result )
-
-        }else{
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , [] )
-
-        }
-
-    } catch (error) {
-        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
-        
+      condition["createdAt"] = {
+        $gte: new Date(startTime),
+        $lte: new Date(endTime),
+      };
     }
 
-    return res.status(response.statusCode).send(response)
+    response = await PatientPromtCommanCrud.getEnteryBasedOnCondition(
+      condition
+    );
 
+    let result = [];
+
+    if (response.result.length) {
+      // let sectionData = await GetSectionAttemptedDataByDate( response.result , sectionId )
+
+      let sectionData;
+
+      for (let i = 0; i < response.result.length; i++) {
+        let sections = response.result[i]["sections"];
+        const date = response.result[i]["createdAt"];
+
+        const formatted = `${String(date.getDate()).padStart(2, "0")}/${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}/${date.getFullYear()}`;
+
+        sections.forEach((section) => {
+          if (section._id.toString() == sectionId.toString()) {
+            sectionData = section;
+          }
+        });
+
+        let questions = [];
+
+        if (!sectionData) {
+          response = Response.sendResponse(
+            true,
+            StatusCodes.NOT_FOUND,
+            "No data found",
+            {}
+          );
+          return res.status(response.statusCode).send(response);
+        }
+
+        sectionData.subSections[0]["data"].forEach((data) => {
+          questions = [...questions, ...data["questions"]];
+        });
+
+        let object = {};
+        object["date"] = formatted;
+        object["data"] = questions;
+        result.push(object);
+      }
+
+      response = Response.sendResponse(
+        true,
+        StatusCodes.OK,
+        CustumMessages.SUCCESS,
+        result
+      );
+    } else {
+      response = Response.sendResponse(
+        true,
+        StatusCodes.OK,
+        CustumMessages.SUCCESS,
+        []
+      );
+    }
+  } catch (error) {
+    response = Response.sendResponse(
+      false,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      error.message,
+      {}
+    );
+  }
+
+  return res.status(response.statusCode).send(response);
 }
 
 

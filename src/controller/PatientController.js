@@ -10,6 +10,13 @@ const config = require('../config/config');
 const PatientPromptsModel = require("../models/PatientsPromtsModel");
 const Constats = require("../utils/Constants");
 const DiagnosticsModel = require("../models/DiagnosticsModel");
+const {
+    defaultMedicationsFaqs,
+    defaultMriSafetyFaqs,
+    defaultSurgicalFaqs,
+    defaultMedicalFaqs,
+    defaultOthersFaqs
+} = require('../utils/Faqs');
 
 //common crud 
 const PatientCommonCrud = new CommonCrud(PatientModel)
@@ -60,6 +67,15 @@ async function Registration( req ,res ){
             return res.status(response.statusCode).send(resBody)
         }
 
+        
+        // Set defaults if missing
+        req.body.medicationsFaqs = req.body.medicationsFaqs || defaultMedicationsFaqs;
+        req.body.mriSafetyFaqs = req.body.mriSafetyFaqs || defaultMriSafetyFaqs;
+        req.body.surgicalFaqs = req.body.surgicalFaqs || defaultSurgicalFaqs;
+        req.body.medicalFaqs = req.body.medicalFaqs || defaultMedicalFaqs;
+        req.body.othersFaqs = req.body.othersFaqs || defaultOthersFaqs;
+
+        // Encrypt password & set secret key
         req.body.password = await Encryption.encrypt(req.body.password);
         req.body.secretKey = await Encryption.randomKey()
         response = await PatientCommonCrud.creatEntery(req.body);
