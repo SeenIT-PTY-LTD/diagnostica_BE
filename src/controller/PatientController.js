@@ -52,14 +52,14 @@ async function Registration( req ,res ){
 
     try {
 
-        const checkEmail = await PatientCommonCrud.getEnteryBasedOnCondition({ email : req.body.email , isActive : true })
+        const checkEmail = await PatientCommonCrud.getEnteryBasedOnCondition({ email: req.body.email, isActive : true })
 
         if(checkEmail['isSuccess'] && checkEmail['result'].length){
             response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Email is alrady present" , {} )
             let resBody = await DefaultEncryptObject( response )
             return res.status(response.statusCode).send(resBody)
         }
-        const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone , countryCode : req.body.countryCode , isActive : true })
+        const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone , countryCode : req.body.countryCode, isActive : true  })
 
         if(checkPhone ['isSuccess'] && checkPhone['result'].length){
             response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Phone is alrady present" , {} )
