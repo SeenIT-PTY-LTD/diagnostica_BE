@@ -7,7 +7,8 @@ const CreateEnteryValidation ={
         step : Joi.number().required(),
         patientId : Joi.string().required(),
         comment: Joi.string(),
-        status : Joi.string()
+        status : Joi.string(),
+        appointmentRefId: Joi.string().required()
     })
 } 
 

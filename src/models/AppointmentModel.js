@@ -25,6 +25,6 @@ const schema = new Schema({
 },{ timestamps : true }
 );
 
-const SubSectionModel = new mongoose.model('appointment', schema);
+const AppointmentModel = new mongoose.model('appointment', schema);
 
-module.exports = SubSectionModel;
+module.exports = AppointmentModel;

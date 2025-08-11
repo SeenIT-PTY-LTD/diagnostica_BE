@@ -10,6 +10,11 @@ const schema = new Schema({
         ref: 'user',
         required : true
     },
+    appointmentRefId : {
+       type: Schema.Types.ObjectId,
+       ref: 'appointment',
+       required : true
+    },
     step : {
         type: Number,
         required : true
