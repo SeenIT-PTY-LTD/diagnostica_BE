@@ -285,6 +285,61 @@ async function UpdateEntery( req ,res ){
 
 }
 
+async function UpdateEnteryByAdmin( req ,res ){
+
+    let response
+
+    try {
+
+        let patientId = req.params.id.toString();
+
+        if( req.body.phone){
+            response = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone })
+
+            if(response.isSuccess && response.result.length){
+
+                if( response.result[0]['_id'].toString() != patientId ){
+                    response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , CustumMessages.PATIENT_ALREADY_EXIST_WITH_SAME_MOBILE , {} )
+                    return res.status(response.statusCode).send(response)
+                }
+               
+
+            }
+        }
+
+        if( req.body.email ){
+
+            response = await PatientCommonCrud.getEnteryBasedOnCondition({ email : req.body.email })
+
+             if(response.isSuccess && response.result.length){
+
+                if( response.result[0]['_id'].toString() != patientId ){
+                    response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , CustumMessages.PATIENT_ALREADY_EXIST_WITH_SAME_EMAIL , {} )
+                    return res.status(response.statusCode).send(response)
+
+                }
+
+            }
+        }
+       
+        response = await PatientCommonCrud.updateEntery( patientId, req.body);
+
+        if(response.isSuccess){
+            response.message = "Patient successfully updated"
+        }
+
+        console.log(response)
+        return res.status(response.statusCode).send(response)
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        
+    }
+
+    return res.status(response.statusCode).send(response)
+
+}
+
 async function UpdateProfileImage(req, res) {
     let response;
 
@@ -539,6 +594,7 @@ module.exports = {
     Login,
     VerifyPhone,
     UpdateEntery,
+    UpdateEnteryByAdmin,
     UpdateProfileImage,
     ResetPasswordByEmail,
     ResetPasswordByPhone,

@@ -38,6 +38,7 @@ Router.put('/reset-password-by-email',validate(Validations.ResetPasswordByEmail)
 
 // update patient by id
 Router.put('/',decryptReqMiddleware,validate(Validations.Update), PatientController.UpdateEntery);
+Router.put('/:id',validate(Validations.Update), PatientController.UpdateEnteryByAdmin);
 
 //update patient profile image
 Router.put('/update-profile-image', upload.single('image'), PatientController.UpdateProfileImage);
