@@ -36,12 +36,12 @@ Router.put('/reset-password-by-phone',decryptReqMiddleware, validate(Validations
 // reset password by email
 Router.put('/reset-password-by-email',validate(Validations.ResetPasswordByEmail), PatientController.ResetPasswordByEmail);
 
+//update patient profile image
+Router.put('/update-profile-image', upload.single('image'), PatientController.UpdateProfileImage);
+
 // update patient by id
 Router.put('/',decryptReqMiddleware,validate(Validations.Update), PatientController.UpdateEntery);
 Router.put('/:id',validate(Validations.Update), PatientController.UpdateEnteryByAdmin);
-
-//update patient profile image
-Router.put('/update-profile-image', upload.single('image'), PatientController.UpdateProfileImage);
 
 // delete patient by id
 Router.delete('/', PatientController.DeleteEntery);
