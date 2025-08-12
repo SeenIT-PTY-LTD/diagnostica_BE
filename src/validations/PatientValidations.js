@@ -56,6 +56,7 @@ const Update = {
     patientCode: Joi.string(),
     medicareNumber: Joi.string(),
     profileImage: Joi.string(),
+
     // Patient details
     patientDetails: Joi.object({
       medicalCard: Joi.string(),
@@ -64,17 +65,34 @@ const Update = {
       emergencyContactPerson: Joi.string(),
       emergencyContactNumber: Joi.string(),
       relationship: Joi.string(),
-      privateHealthInsurance: Joi.string(),
+      privateHealthInsurance: Joi.object({
+        Yes: Joi.string().allow(null, ""),
+        No: Joi.string().allow(null, "")
+      }),
       healthFund: Joi.string(),
       memberNumber: Joi.string(),
       pensionNumber: Joi.string(),
       expiryDate: Joi.string(),
-      questionReply: Joi.string(),
+      questionReply: Joi.object({
+        doctorSpecialist: Joi.string().allow(null, ""),
+        workCover: Joi.string().allow(null, ""),
+        anotherPatient: Joi.string().allow(null, ""),
+        familyFriend: Joi.string().allow(null, ""),
+        physio: Joi.string().allow(null, ""),
+        google: Joi.string().allow(null, ""),
+        facebook: Joi.string().allow(null, ""),
+        instagram: Joi.string().allow(null, ""),
+        hospitalStaff: Joi.string().allow(null, ""),
+        signage: Joi.string().allow(null, "")
+      })
     }),
 
     // Doctor details
     doctorDetails: Joi.object({
-      doctorType: Joi.string(),
+      doctorType: Joi.object({
+        generalPhysician: Joi.string(),
+        specialist: Joi.string()
+      }),
       doctorAddress: Joi.string(),
       referDoctorNumber: Joi.string(),
       generalDoctorName: Joi.string(),
@@ -96,7 +114,7 @@ const Update = {
       contactPersonLastName: Joi.string(),
     }),
 
-    // Work cover insurance details
+    // Insurance details
     insuranceDetails: Joi.object({
       insuranceCompanyName: Joi.string(),
       insuranceCompanyAddress: Joi.string(),
@@ -105,50 +123,45 @@ const Update = {
       managerPhone: Joi.string(),
       managerEmail: Joi.string(),
     }),
-    //medications and allergies
+
+    // Medications and allergies
     medicationsFaqs: Joi.array()
-      .items(
-        Joi.object({
-          question: Joi.string().required(),
-          answer: Joi.string().required(),
-        })
-      )
+      .items(Joi.object({
+        question: Joi.string().required(),
+        answer: Joi.string().required(),
+      }))
       .default([]),
-    //mri safety questions
+
+    // MRI safety questions
     mriSafetyFaqs: Joi.array()
-      .items(
-        Joi.object({
-          question: Joi.string().required(),
-          answer: Joi.string().required(),
-        })
-      )
+      .items(Joi.object({
+        question: Joi.string().required(),
+        answer: Joi.string().required(),
+      }))
       .default([]),
-    //surgical questions
+
+    // Surgical questions
     surgicalFaqs: Joi.array()
-      .items(
-        Joi.object({
-          question: Joi.string().required(),
-          answer: Joi.string().required(),
-        })
-      )
+      .items(Joi.object({
+        question: Joi.string().required(),
+        answer: Joi.string().required(),
+      }))
       .default([]),
-    //medical questions
+
+    // Medical questions
     medicalFaqs: Joi.array()
-      .items(
-        Joi.object({
-          question: Joi.string().required(),
-          answer: Joi.string().required(),
-        })
-      )
+      .items(Joi.object({
+        question: Joi.string().required(),
+        answer: Joi.string().required(),
+      }))
       .default([]),
-    //othersFaqs questions
+
+    // Others FAQs
     othersFaqs: Joi.array()
-      .items(
-        Joi.object({
-          question: Joi.string().required(),
-          answer: Joi.string().required(),
-        })
-      )
+      .items(Joi.object({
+        question: Joi.string().required(),
+        answer: Joi.string().required(),
+      }))
       .default([]),
   }),
 };
