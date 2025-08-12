@@ -35,132 +35,125 @@ const VerifyPhone = {
   }),
 };
 
+const optionalString = Joi.string().allow("", null);
+
 const Update = {
   params: Joi.object({
     id: Joi.string().required(),
   }),
   body: Joi.object({
-    firstName: Joi.string(),
-    lastName: Joi.string(),
-    phone: Joi.string(),
-    dob: Joi.string(),
-    gender: Joi.string(),
-    email: Joi.string(),
-    country: Joi.string(),
-    urn: Joi.string(),
-    height: Joi.string(),
-    weight: Joi.string(),
-    address: Joi.string(),
-    state: Joi.string(),
-    postcode: Joi.string(),
-    patientCode: Joi.string(),
-    medicareNumber: Joi.string(),
-    profileImage: Joi.string(),
+    firstName: optionalString,
+    lastName: optionalString,
+    phone: optionalString,
+    dob: optionalString,
+    gender: optionalString,
+    email: optionalString,
+    country: optionalString,
+    urn: optionalString,
+    height: optionalString,
+    weight: optionalString,
+    address: optionalString,
+    state: optionalString,
+    postcode: optionalString,
+    patientCode: optionalString,
+    medicareNumber: optionalString,
+    profileImage: optionalString,
 
-    // Patient details
     patientDetails: Joi.object({
-      medicalCard: Joi.string(),
-      personId: Joi.string(),
-      occupation: Joi.string(),
-      emergencyContactPerson: Joi.string(),
-      emergencyContactNumber: Joi.string(),
-      relationship: Joi.string(),
+      medicalCard: optionalString,
+      personId: optionalString,
+      occupation: optionalString,
+      emergencyContactPerson: optionalString,
+      emergencyContactNumber: optionalString,
+      relationship: optionalString,
       privateHealthInsurance: Joi.object({
-        Yes: Joi.string().allow(null, ""),
-        No: Joi.string().allow(null, "")
+        Yes: optionalString,
+        No: optionalString
       }),
-      healthFund: Joi.string(),
-      memberNumber: Joi.string(),
-      pensionNumber: Joi.string(),
-      expiryDate: Joi.string(),
+      healthFund: optionalString,
+      memberNumber: optionalString,
+      pensionNumber: optionalString,
+      expiryDate: optionalString,
       questionReply: Joi.object({
-        doctorSpecialist: Joi.string().allow(null, ""),
-        workCover: Joi.string().allow(null, ""),
-        anotherPatient: Joi.string().allow(null, ""),
-        familyFriend: Joi.string().allow(null, ""),
-        physio: Joi.string().allow(null, ""),
-        google: Joi.string().allow(null, ""),
-        facebook: Joi.string().allow(null, ""),
-        instagram: Joi.string().allow(null, ""),
-        hospitalStaff: Joi.string().allow(null, ""),
-        signage: Joi.string().allow(null, "")
+        doctorSpecialist: optionalString,
+        workCover: optionalString,
+        anotherPatient: optionalString,
+        familyFriend: optionalString,
+        physio: optionalString,
+        google: optionalString,
+        facebook: optionalString,
+        instagram: optionalString,
+        hospitalStaff: optionalString,
+        signage: optionalString
       })
     }),
 
-    // Doctor details
     doctorDetails: Joi.object({
       doctorType: Joi.object({
-        generalPhysician: Joi.string(),
-        specialist: Joi.string()
+        generalPhysician: optionalString,
+        specialist: optionalString
       }),
-      doctorAddress: Joi.string(),
-      referDoctorNumber: Joi.string(),
-      generalDoctorName: Joi.string(),
-      generaldoctorNumber: Joi.string(),
-      generalDoctorAddress: Joi.string(),
-      physiotherapistName: Joi.string(),
-      physiotherapistNumber: Joi.string(),
-      physiotherapistAddress: Joi.string(),
+      doctorAddress: optionalString,
+      referDoctorNumber: optionalString,
+      generalDoctorName: optionalString,
+      generaldoctorNumber: optionalString,
+      generalDoctorAddress: optionalString,
+      physiotherapistName: optionalString,
+      physiotherapistNumber: optionalString,
+      physiotherapistAddress: optionalString,
     }),
 
-    // Worker compensation
     workerCompensation: Joi.object({
-      claimNumber: Joi.string(),
-      dateOfInjury: Joi.string(),
-      companyName: Joi.string(),
-      permanentAddress: Joi.string(),
-      contactPersonNameAtWorkplace: Joi.string(),
-      contactPersonFirstName: Joi.string(),
-      contactPersonLastName: Joi.string(),
+      claimNumber: optionalString,
+      dateOfInjury: optionalString,
+      companyName: optionalString,
+      permanentAddress: optionalString,
+      contactPersonNameAtWorkplace: optionalString,
+      contactPersonFirstName: optionalString,
+      contactPersonLastName: optionalString,
     }),
 
-    // Insurance details
     insuranceDetails: Joi.object({
-      insuranceCompanyName: Joi.string(),
-      insuranceCompanyAddress: Joi.string(),
-      managerFirstName: Joi.string(),
-      managerLastName: Joi.string(),
-      managerPhone: Joi.string(),
-      managerEmail: Joi.string(),
+      insuranceCompanyName: optionalString,
+      insuranceCompanyAddress: optionalString,
+      managerFirstName: optionalString,
+      managerLastName: optionalString,
+      managerPhone: optionalString,
+      managerEmail: optionalString,
     }),
 
-    // Medications and allergies
     medicationsFaqs: Joi.array()
       .items(Joi.object({
-        question: Joi.string().required(),
-        answer: Joi.string().required(),
+        question: optionalString.required(),
+        answer: optionalString.required(),
       }))
       .default([]),
 
-    // MRI safety questions
     mriSafetyFaqs: Joi.array()
       .items(Joi.object({
-        question: Joi.string().required(),
-        answer: Joi.string().required(),
+        question: optionalString.required(),
+        answer: optionalString.required(),
       }))
       .default([]),
 
-    // Surgical questions
     surgicalFaqs: Joi.array()
       .items(Joi.object({
-        question: Joi.string().required(),
-        answer: Joi.string().required(),
+        question: optionalString.required(),
+        answer: optionalString.required(),
       }))
       .default([]),
 
-    // Medical questions
     medicalFaqs: Joi.array()
       .items(Joi.object({
-        question: Joi.string().required(),
-        answer: Joi.string().required(),
+        question: optionalString.required(),
+        answer: optionalString.required(),
       }))
       .default([]),
 
-    // Others FAQs
     othersFaqs: Joi.array()
       .items(Joi.object({
-        question: Joi.string().required(),
-        answer: Joi.string().required(),
+        question: optionalString.required(),
+        answer: optionalString.required(),
       }))
       .default([]),
   }),
