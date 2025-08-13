@@ -32,7 +32,7 @@ Router.put('/update-section-data',decryptReqMiddleware, validate(Validations.Upd
 
 Router.post('/upload-img',upload.single('image'), controller.UploadImg )
 
-Router.post('/add-img-prompt', upload.single('image'),controller.AddImageInprompt);
+Router.post('/add-img-prompt', upload.array("images", 10),controller.AddImageInprompt);
 
 Router.get('/attempted-sub-sections-by-date',validate(Validations.AttemptedSubSectionByDate), controller.GetUserAttemptedSubSectionPromtsDateWise);
 

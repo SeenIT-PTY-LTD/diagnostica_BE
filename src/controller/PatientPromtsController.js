@@ -269,8 +269,9 @@ async function AddImageInprompt(req,res){
      let response
     try {
 
-        console.log(req.file,'================================')
-        let image = req.file.filename
+        let image = req.files.map(file => {
+            return file.filename
+        }); 
 
         response = await PatientsPromptsCommonCrud.getSingleEntery(req.body.patientPromptId);
 
