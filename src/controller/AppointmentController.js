@@ -104,13 +104,21 @@ async function GetSectionAttemptedData(req, res) {
           return res.status(response.statusCode).send(response);
         }
 
-        sectionData.subSections[0]["data"].forEach((data) => {
-          questions = [...questions, ...data["questions"]];
-        });
+     
 
         let object = {};
         object["date"] = formatted;
-        object["data"] = questions;
+
+        if( sectionData.sectionCode == "Images" ){
+          object["data"] = sectionData
+        } else {
+
+             sectionData.subSections[0]["data"].forEach((data) => {
+
+          questions = [...questions, ...data["questions"]];
+        });
+          object["data"] = questions;
+        }
         result.push(object);
       }
 

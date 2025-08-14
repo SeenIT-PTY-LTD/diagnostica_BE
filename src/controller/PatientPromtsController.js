@@ -265,52 +265,55 @@ async function CreateNewPatientPromts(req,res){
     return res.status(response.statusCode).send(resBody)
 }
 
-async function AddImageInprompt(req,res){
-     let response
+async function AddImageInprompt(req, res) {
+    let response;
     try {
-
-        let image = req.files.map(file => {
-            return file.filename
-        }); 
-
         response = await PatientsPromptsCommonCrud.getSingleEntery(req.body.patientPromptId);
 
-        let data =  JSON.parse( JSON.stringify(response.result[0]))
+        if (!response?.result?.[0]) {
+            return res.status(404).send(Response.sendResponse(false, 404, "Patient prompt not found", {}));
+        }
 
-        data.sections.forEach(section => {
+        let data = JSON.parse(JSON.stringify(response.result[0]));
 
-            if (section.sectionCode === "Images") {
-                
+        let image = (req.files || []).map(file => file.filename);
+
+        // First update sectionData if Images section exists
+        data.sections?.forEach((section, index) => {
+            if (section.sectionCode === "Images" && section.subSections?.[0]) {
+                section.subSections[0].data = JSON.parse(req.body.sectionData || "[]");
+            }
+        });
+
+        // Then update image inside questions
+        data.sections?.forEach(section => {
+            if (section.sectionCode === "Images" && Array.isArray(section.subSections)) {
                 section.subSections.forEach(subSection => {
-
-                subSection.data.forEach(item => {
-
-                    item.questions.forEach(question => {
-
-                    if (question.media && Array.isArray(question.media)) {
-                       
-                            question.img = image
-                        
-                        }
-                    });
-                });
+                    if (Array.isArray(subSection.data)) {
+                        subSection.data.forEach(item => {
+                            if (Array.isArray(item.questions)) {
+                                item.questions.forEach(question => {
+                                    if (Array.isArray(question.media)) {
+                                        question.img = image;
+                                    }
+                                });
+                            }
+                        });
+                    }
                 });
             }
         });
 
-        
-        response = await PatientsPromptsCommonCrud.updateEntery( req.body.patientPromptId, data );
+        response = await PatientsPromptsCommonCrud.updateEntery(req.body.patientPromptId, data);
 
-        if(response.isSuccess){
-            response = Response.sendResponse( true, StatusCodes.OK , "Image uploaded successfully" , {} )
-
+        if (response.isSuccess) {
+            response = Response.sendResponse(true, StatusCodes.OK, "Image uploaded successfully", {});
         }
 
     } catch (error) {
-        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
-
+        response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
     }
-    return res.status(response.statusCode).send(response)
+    return res.status(response.statusCode).send(response);
 }
 
 async function GetPromtsByBodypart(req,res){
