@@ -288,6 +288,7 @@ async function AddImageInprompt(req, res) {
         // Then update image inside questions
         data.sections?.forEach(section => {
             if (section.sectionCode === "Images" && Array.isArray(section.subSections)) {
+
                 section.subSections.forEach(subSection => {
                     if (Array.isArray(subSection.data)) {
                         subSection.data.forEach(item => {
@@ -301,8 +302,12 @@ async function AddImageInprompt(req, res) {
                         });
                     }
                 });
+
+                section.status = Constats.STATUS.COMPLETED; // Mark section as completed
             }
         });
+
+
 
         response = await PatientsPromptsCommonCrud.updateEntery(req.body.patientPromptId, data);
 
