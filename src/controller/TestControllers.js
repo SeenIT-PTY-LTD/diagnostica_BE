@@ -6,8 +6,7 @@ const { StatusCodes } = require("../utils/StatusCodes")
 
 
 async function TestController( req ,res ){
-    let token = await DefaultEncryptObject(req.body)
-    let response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , { "token": token} )
+    let response = Response.sendResponse( true, StatusCodes.OK , "Server is accessable required token" , { message : "Server is accessable required token"} )
     return res.status(response.statusCode).send(response)
 }
 

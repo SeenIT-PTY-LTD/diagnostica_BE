@@ -11,6 +11,7 @@ const UserCommanCrud = new CommonCrud(UserModel);
 const AuthMiddleware = async (req, res, next) => {
   const exemptedRoutes = [
     { method: "POST", path: "/test" },
+     { method: "GET", path: "/test" },
     { method: "POST", path: "/patient/registration" },
     { method: "POST", path: "/patient/login" },
     { method: "POST", path: "/patient/varify-phone" },
