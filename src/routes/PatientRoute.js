@@ -21,6 +21,9 @@ const upload = multer({ storage });
 // registor patient
 Router.post('/registration',decryptReqMiddleware,validate(Validations.RegistrationValidation) , PatientController.Registration);
 
+//verify email
+Router.get("/verify-email/:token", PatientController.VerifyEmail);
+
 // login
 Router.post('/login',decryptReqMiddleware,validate(Validations.Login), PatientController.Login);
 

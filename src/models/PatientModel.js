@@ -52,6 +52,7 @@ const workerCompensationSchema = new mongoose.Schema({
   contactPersonNameAtWorkplace: { type: String, default: "" },
   contactPersonFirstName: { type: String, default: "" },
   contactPersonLastName: { type: String, default: "" },
+  contactPersonNumber: { type: String, default: "" },
 });
 
 const insuranceDetailsSchema = new mongoose.Schema({
@@ -168,6 +169,18 @@ const schema = new mongoose.Schema(
     profileImage: {
       type: String,
       default: "",
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      default: "",
+    },
+    verificationExpires: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true }
