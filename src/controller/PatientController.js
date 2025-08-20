@@ -162,7 +162,7 @@ async function Registration(req, res) {
 
     if (response.isSuccess) {
       // Build verification URL (frontend link or API link)
-      const verificationUrl = `http://localhost:3000/verify/${token}`;
+      const verificationUrl = `https://d2l873mxalz3b9.cloudfront.net/verify/${token}`;
 
       // Send verification email using reusable Email2FAVerification
       await Email2FAVerification(
