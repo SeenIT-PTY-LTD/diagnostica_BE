@@ -79,7 +79,7 @@ async function UpdateSubSectionMetadata( req ,res ){
 
     try {
 
-        const { sectionId , sectionData ,patientPromptId } = req.body;
+        let { sectionId , sectionData ,patientPromptId } = req.body;
 
         
         const userAttenptedSectionResponse = await PatientsPromptsCommonCrud.getSingleEntery(patientPromptId);
@@ -95,30 +95,16 @@ async function UpdateSubSectionMetadata( req ,res ){
 
         userAttenptedData.sections.forEach((section,sectionIndex) =>{
 
-            if(section._id.toString() == sectionId){
+            if(section._id.toString() == sectionId.toString()){
 
-                // section.subSections.forEach((subSection,subSectionIndex) =>{
+                sectionData.updatedAt = new Date();
+                sectionData.status = Constats.STATUS.COMPLETED;
+                userAttenptedData.sections[sectionIndex].subSections[0]['data'] = [sectionData];
 
-                //     if( sectionData._id.toString() == subSection._id.toString()){
-
-                        userAttenptedData.sections[sectionIndex] = sectionData;
-
-                        // let totalSubSection = userAttenptedData.sections[sectionIndex]['subSections'].length;
-                        // let completedSubSectionCount = 0
-
-                        // userAttenptedData.sections[sectionIndex]['subSections'].forEach((subSection) =>{
-                        //     if(subSection.status == Constats.STATUS.COMPLETED ){
-                        //         completedSubSectionCount++
-                        //     }
-                        // })  
-
-                        // if(totalSubSection == completedSubSectionCount){
-                        //     userAttenptedData.sections[sectionIndex]['status'] = Constats.STATUS.COMPLETED;
-                        // }
-                    // }
-
-                // })
-                
+                console.log( userAttenptedData.sections[sectionIndex].subSections[0]['data'])
+                section.status = Constats.STATUS.COMPLETED;
+                section.updatedAt = new Date();
+               
             }
 
         });
@@ -175,6 +161,7 @@ async function UpdateSubSectionMetadata( req ,res ){
         }
 
     } catch (error) {
+        console.log(error.message,'===================eror')
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
     }
@@ -235,13 +222,17 @@ async function CreateNewPatientPromts(req,res){
                 const subSectionData = sebSectionResponse.result;
 
                 section.subSections = [];
-                section.status = Constats.STATUS.PENDING
+                section.status = Constats.STATUS.PENDING;
+                section.createdAt = new Date();
+                section.updatedAt = new Date()
 
                 for( let k = 0; k < subSectionData.length; k++){
                 
                     let subSection = JSON.parse(JSON.stringify(subSectionData[k]))
                     console.log('*****subSection',subSection)
                     subSection['status'] = Constats.STATUS.PENDING;
+                    subSection.createdAt = new Date();
+                    subSection.updatedAt = new Date();
                     section.subSections.push(subSection)
                 }
                
