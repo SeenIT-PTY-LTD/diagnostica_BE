@@ -97,11 +97,8 @@ async function UpdateSubSectionMetadata( req ,res ){
 
             if(section._id.toString() == sectionId.toString()){
 
-                sectionData.updatedAt = new Date();
-                sectionData.status = Constats.STATUS.COMPLETED;
-                userAttenptedData.sections[sectionIndex].subSections[0]['data'] = [sectionData];
-
-                console.log( userAttenptedData.sections[sectionIndex].subSections[0]['data'])
+                userAttenptedData.sections[sectionIndex].subSections[0]['data'] = sectionData;
+                
                 section.status = Constats.STATUS.COMPLETED;
                 section.updatedAt = new Date();
                

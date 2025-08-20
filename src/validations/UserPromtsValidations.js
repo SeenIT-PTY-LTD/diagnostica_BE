@@ -20,7 +20,7 @@ const UpdateSubSectionPrompt ={
     body : Joi.object({
       patientPromptId : Joi.string().required(),
       sectionId : Joi.string().required(),
-      sectionData : Joi.object().required()
+      sectionData : Joi.any().required()
     })
 } 
 
