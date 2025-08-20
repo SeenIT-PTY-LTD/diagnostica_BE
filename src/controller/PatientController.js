@@ -19,6 +19,7 @@ const {
 } = require('../utils/Faqs');
 const crypto = require('crypto');
 const { Email2FAVerification } = require("../services/EmailService");
+const { isNotEmpty, calculateBMI } = require("../utils/helpers");
 
 //common crud 
 const PatientCommonCrud = new CommonCrud(PatientModel)
@@ -142,6 +143,10 @@ async function Registration(req, res) {
     req.body.surgicalFaqs = req.body.surgicalFaqs || defaultSurgicalFaqs;
     req.body.medicalFaqs = req.body.medicalFaqs || defaultMedicalFaqs;
     req.body.othersFaqs = req.body.othersFaqs || defaultOthersFaqs;
+
+    if( isNotEmpty(req.body.height) && isNotEmpty(req.body.weight)){
+        req.body.bmi = (calculateBMI( req.body.weight , req.body.height ))['category']
+    }
 
     // Encrypt password & generate keys
     req.body.password = await Encryption.encrypt(req.body.password);
@@ -374,6 +379,10 @@ async function UpdateEntery( req ,res ){
                 }
 
             }
+        }
+
+        if( isNotEmpty(req.body.height) && isNotEmpty(req.body.weight)){
+            req.body.bmi = (calculateBMI( req.body.weight , req.body.height ))['category']
         }
        
         response = await PatientCommonCrud.updateEntery( patientId, req.body);
