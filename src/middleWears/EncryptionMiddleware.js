@@ -6,7 +6,11 @@ const config = require('../config/config')
 const decryptReqMiddleware = async(req, res, next) => {
   try {
 
-    console.log(req.body)
+    if( !req.body.token){
+      let response = Response.sendResponse(false, 406, "token is required", {})
+      return res.status(response.statusCode).send(response)
+    }
+   
     let token = await decryptObject(req.body.token, config.CryptoSecretKey);
     if (!token) {
       let response = Response.sendResponse(false, 400, "Invalid token", {})
