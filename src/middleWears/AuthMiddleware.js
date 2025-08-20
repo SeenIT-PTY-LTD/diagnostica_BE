@@ -26,6 +26,11 @@ const AuthMiddleware = async (req, res, next) => {
     { method: "POST", path: "/patient/token" },
   ];
 
+  // ✅ First: allow verify-email/:token
+  if (req.method === "GET" && req.path.includes("/verify-email/")) {
+    return next();
+  }
+
   // Check if route is exempted
   const isExempted = exemptedRoutes.some(
     (route) => route.method === req.method && route.path === req.path

@@ -69,6 +69,51 @@ async function DoctorForgotPasswordEmail( to , fullName, token  ){
         
 }
 
+// Register Handlebars helpers
+Handlebars.registerHelper("formatDate", function (date) {
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return new Intl.DateTimeFormat("en-US", options).format(date);
+});
+
+Handlebars.registerHelper("now", function () {
+  return new Date();
+});
+
+async function Email2FAVerification(to, verificationUrl, expirationTime) {
+  let response;
+  try {
+    const tempPath = process.cwd() + "/src/templates/patient/Email2FAVerification.hbs";
+    const file = fs.readFileSync(tempPath, "utf8").toString();
+    const template = Handlebars.compile(file);
+
+    // dynamic data for template
+    const obj = {
+      verificationUrl,
+      expirationTime, 
+      now: new Date()
+    };
+
+    const emailHtml = template(obj);
+
+    const emailObj = {
+      to,
+      subject: "Email Verification",
+      html: emailHtml,
+    };
+
+    response = await SendEmail(emailObj);
+  } catch (err) {
+    response = Response.sendResponse(
+      false,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      err.message,
+      {}
+    );
+  }
+
+  return response;
+}
+
 async function SendEmail( data ) {
 
   let response 
@@ -86,7 +131,7 @@ async function SendEmail( data ) {
       });
 
       const mailOptions = {
-        from: '"Website Enquiry Form" <support@diagnostica.app>',
+        from: `${data.subject || "Website Enquiry Form"} <support@diagnostica.app>`,
         to: data.to,
         subject: data.subject,
         html: data.html
@@ -107,6 +152,7 @@ async function SendEmail( data ) {
 
 module.exports = {
     SendRefferalEmail,
+    Email2FAVerification,
     SendEmail,
     DoctorForgotPasswordEmail
 };

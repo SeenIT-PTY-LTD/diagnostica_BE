@@ -111,6 +111,7 @@ const Update = {
       contactPersonNameAtWorkplace: optionalString,
       contactPersonFirstName: optionalString,
       contactPersonLastName: optionalString,
+      contactPersonNumber: optionalString,
     }),
 
     insuranceDetails: Joi.object({
