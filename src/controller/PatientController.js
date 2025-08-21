@@ -246,13 +246,13 @@ async function Login( req ,res ){
 
             const token = await JWT.createToken({ id : patient._id , role : "patient" , secretKey : secretKey })
 
-            console.log(token)
-
-
             if(token['status']){
 
-                console.log(token['result'] ,'*****token***')
-                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, {  authToken : token['result'] } )
+                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, {  
+                    authToken : token['result'],
+                    phone : patient.phone,
+                    countryCode : patient.countryCode
+                } )
                 let resBody = await DefaultEncryptObject(response)
                 return res.status(StatusCodes.OK).send(resBody)
 
@@ -690,6 +690,24 @@ async function CreateToken( req ,res ){
 
 }
 
+async function DecryptToken( req ,res ){
+
+    let response
+
+    try {
+
+          response = Response.sendResponse( true, StatusCodes.OK , "" , req.body )
+
+    } catch (error) {
+        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        
+    }
+
+    return res.status(200).send(response)
+
+}
+
+
 async function GetPatientDiagnotica( req ,res ){
 
     let response
@@ -725,5 +743,6 @@ module.exports = {
     Logout,
     ResetPasswordWithToken,
     CreateToken,
+    DecryptToken,
     GetPatientDiagnotica
 }
