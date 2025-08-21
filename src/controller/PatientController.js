@@ -696,14 +696,13 @@ async function DecryptToken( req ,res ){
 
     try {
 
-          response = Response.sendResponse( true, StatusCodes.OK , "" , req.body )
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
     }
 
-    return res.status(200).send(response)
+    return res.status(200).send(req.body)
 
 }
 
@@ -713,8 +712,8 @@ async function GetPatientDiagnotica( req ,res ){
     let response
 
     try {
-
-        response = await DiagnosticsCommonCrud.getEnteryBasedOnCondition({patientId : req.user._id.toString(), status : 'Completed'})
+        console.log({patientId : req.user._id.toString(), status : Constats.STATUS.COMPLETED })
+        response = await DiagnosticsCommonCrud.getEnteryBasedOnCondition({patientId : req.user._id.toString(), status : Constats.STATUS.COMPLETED })
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )

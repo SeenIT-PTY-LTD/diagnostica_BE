@@ -98,7 +98,6 @@ async function UpdateSubSectionMetadata( req ,res ){
             if(section._id.toString() == sectionId.toString()){
 
                 userAttenptedData.sections[sectionIndex].subSections[0]['data'] = sectionData;
-                
                 section.status = Constats.STATUS.COMPLETED;
                 section.updatedAt = new Date();
                
@@ -296,8 +295,6 @@ async function AddImageInprompt(req, res) {
                 section.status = Constats.STATUS.COMPLETED; // Mark section as completed
             }
         });
-
-
 
         response = await PatientsPromptsCommonCrud.updateEntery(req.body.patientPromptId, data);
 
@@ -555,10 +552,9 @@ async function getPatientPromptByBodyPart(req, res) {
     let response;
 
     try {
-        const patientId = req.user._id.toString(); // or req.user.patientId depending on your setup
-        console.log("patientId",patientId);
+        const patientId = req.user._id.toString(); 
         
-        const { bodyPartId } = req.query; // or req.body / req.params
+        const { bodyPartId } = req.query; 
 
         if (!bodyPartId) {
 
@@ -569,14 +565,13 @@ async function getPatientPromptByBodyPart(req, res) {
 
         let condition = {
             patientId : patientId,
-            bodyPartId: bodyPartId
+            bodyPartId: bodyPartId,
+            status : Constats.STATUS.COMPLETED
         }
 
-        console.log(condition,'***condition')
         const data = await PatientsPromptsCommonCrud.getEnteryBasedOnCondition( condition )
-        console.log("data",data)
+        response = Response.sendResponse(true, StatusCodes.OK, "Patient prompt fetched successfully", data.result || []);
 
-        response = Response.sendResponse(true, StatusCodes.OK, "Patient prompt fetched successfully", data.result || {});
     } catch (error) {
         response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
     }
