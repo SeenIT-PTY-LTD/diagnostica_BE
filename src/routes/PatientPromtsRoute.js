@@ -40,4 +40,6 @@ Router.post('/create',decryptReqMiddleware, validate(Validations.CreatePatientPr
 
 Router.post('/assign-by-doctor', validate(Validations.AssignByDoctor), controller.AssignPromtByDoctor)
 
+Router.get('/:id',controller.getSinglePromById);
+
 module.exports = Router;

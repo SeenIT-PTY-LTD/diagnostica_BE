@@ -582,6 +582,23 @@ async function getPatientPromptByBodyPart(req, res) {
 }
 
 
+async function getSinglePromById(req, res) {
+    let response;
+
+    try {
+    
+        response = await PatientsPromptsCommonCrud.getSingleEntery(req.params.id)
+    } catch (error) {
+        response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
+    }
+
+    let resBody = await DefaultEncryptObject(response)
+    return res.status(response.statusCode).send(resBody)
+
+}
+
+
+
 
 module.exports = {
   GetSectionsMetadata,
@@ -594,5 +611,6 @@ module.exports = {
   UploadImg,
   GetPromtsByBodypart,
   getPatientPromptByBodyPart,
-  AddImageInprompt
+  AddImageInprompt,
+  getSinglePromById
 }
