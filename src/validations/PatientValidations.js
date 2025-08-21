@@ -127,6 +127,7 @@ const Update = {
       .items(Joi.object({
         question: optionalString.required(),
         answer: optionalString.required(),
+        options : Joi.any()
       }))
       .default([]),
 
@@ -134,6 +135,8 @@ const Update = {
       .items(Joi.object({
         question: optionalString.required(),
         answer: optionalString.required(),
+        options : Joi.any()
+
       }))
       .default([]),
 
@@ -141,6 +144,8 @@ const Update = {
       .items(Joi.object({
         question: optionalString.required(),
         answer: optionalString.required(),
+        options : Joi.any()
+
       }))
       .default([]),
 
@@ -148,6 +153,7 @@ const Update = {
       .items(Joi.object({
         question: optionalString.required(),
         answer: optionalString.required(),
+        options : Joi.any()
       }))
       .default([]),
 
@@ -155,6 +161,7 @@ const Update = {
       .items(Joi.object({
         question: optionalString.required(),
         answer: optionalString.required(),
+        options : Joi.any()
       }))
       .default([]),
   }),
