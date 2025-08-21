@@ -302,7 +302,9 @@ async function GetPatientDeatils( req ,res ){
 
         const patientPromtResponse  = await PatientPromptsCrud.getEnteryBasedOnCondition({ patientId : patientId , status : Constats.STATUS.PENDING ,isFollowUp : false });
 
-        result['promptIds'] =  patientPromtResponse.result.map( promt => promt._id.toString())
+        result['promptIds'] = patientPromtResponse.result.map( promt => ({
+            [promt.bodyPartId] : promt._id.toString()
+        }));
 
         const patientPromtFollowUpResponse  = await PatientPromptsCrud.getEnteryBasedOnCondition({ patientId : patientId , status : Constats.STATUS.PENDING ,isFollowUp : true });
 
