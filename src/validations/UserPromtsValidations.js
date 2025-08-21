@@ -43,8 +43,7 @@ const AttemptedSubSectionByDate={
 
 const CreatePatientPromt ={
     body : Joi.object({
-      bodyPartId : Joi.string().required(),
-      patientId : Joi.string().required()
+      bodyPartId : Joi.string().required()
     })
 } 
 

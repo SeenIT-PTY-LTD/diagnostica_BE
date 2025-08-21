@@ -190,7 +190,9 @@ async function CreateNewPatientPromts(req,res){
      let response
     try {
 
-        const { patientId , bodyPartId } = req.body;
+        const { bodyPartId } = req.body;
+
+        const patientId = req.user._id;
 
         let userAttenptedSectionData = {};
 
