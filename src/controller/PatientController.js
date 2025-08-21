@@ -245,7 +245,9 @@ async function Login( req ,res ){
                 "Please verify your email before logging in.",
                 {}
             );
-            return res.status(response.statusCode).send(response);
+
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(response.statusCode).send(resBody);
         }
 
         let compare = await Encryption.compare(  password, patient['password']  )
@@ -461,7 +463,6 @@ async function UpdateEnteryByAdmin( req ,res ){
             response.message = "Patient successfully updated"
         }
 
-        console.log(response)
         return res.status(response.statusCode).send(response)
 
     } catch (error) {
@@ -589,7 +590,6 @@ async function DeleteEntery( req ,res ){
         response = await PatientCommonCrud.updateEntery( req.user._id.toString(), { isActive : false} );
 
     } catch (error) {
-        console.log(error)
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
     }
@@ -726,8 +726,22 @@ async function GetPatientDiagnotica( req ,res ){
     let response
 
     try {
-        console.log({patientId : req.user._id.toString(), status : Constats.STATUS.COMPLETED })
-        response = await DiagnosticsCommonCrud.getEnteryBasedOnCondition({patientId : req.user._id.toString(), status : Constats.STATUS.COMPLETED })
+
+        let result = await DiagnosticsModel.find({patientId : req.user._id.toString(), status : Constats.STATUS.COMPLETED })
+                    .skip(offset)
+                    .limit(size)
+                    .sort(sort)
+                    .populate('doctorId', '_id firstName lastName')
+                    .populate('patientId', '_id firstName lastName')
+                    .lean(); 
+        
+        result = result.map(item => ({
+            ...item,
+            doctorId:  item.doctorId,
+            patientId:  item.patientId
+        }));
+
+        response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , result )
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )

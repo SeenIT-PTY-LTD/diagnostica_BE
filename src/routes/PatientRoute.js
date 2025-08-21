@@ -52,8 +52,6 @@ Router.put('/:id',validate(Validations.Update), PatientController.UpdateEnteryBy
 // delete patient by id
 Router.delete('/', PatientController.DeleteEntery);
 
-
-
 Router.post('/logout', PatientController.Logout)
 
 Router.get('/diagnotica', PatientController.GetPatientDiagnotica)
@@ -65,6 +63,6 @@ Router.get('/',validate(Validations.GetAllEnteries), PatientController.GetAllEnt
 
 Router.post('/token', PatientController.CreateToken)
 
-
+Router.post('/decrypt-token', PatientController.CreateToken)
 
 module.exports = Router;
