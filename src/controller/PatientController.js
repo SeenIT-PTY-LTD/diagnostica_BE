@@ -236,6 +236,18 @@ async function Login( req ,res ){
 
         let patient = response['result'][0];
 
+        // Check if email is verified
+        if (!patient.isVerified) {
+            console.log("Patient not verified", patient.isVerified);
+            response = Response.sendResponse(
+                false,
+                StatusCodes.UNAUTHORIZED,
+                "Please verify your email before logging in.",
+                {}
+            );
+            return res.status(response.statusCode).send(response);
+        }
+
         let compare = await Encryption.compare(  password, patient['password']  )
 
         if( compare['status']){
