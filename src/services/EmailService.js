@@ -114,7 +114,7 @@ async function Email2FAVerification(to, verificationUrl, expirationTime) {
   return response;
 }
 
-async function DiagnosticSupportEmail(toAdmin, userEmail, subject, content, imageUrls, pdfUrls) {
+async function DiagnosticSupportEmail(toAdmin, userEmail, subject, content, imageUrls) {
   let response;
   try {
     const tempPath = process.cwd() + "/src/templates/patient/DiagnosticSupport.hbs";
@@ -125,14 +125,14 @@ async function DiagnosticSupportEmail(toAdmin, userEmail, subject, content, imag
       email: userEmail,
       subject,
       content,
-      imageUrls: imageUrls || [],
-      pdfUrls: pdfUrls || [],
+      imageUrls: imageUrls || [], // pass array
     };
 
     const emailHtml = template(obj);
+    console.log("emailHtml", emailHtml);
 
     const emailObj = {
-      to: toAdmin,
+      to: toAdmin, // admin email from config
       subject: `Diagnostic Support - ${subject}`,
       html: emailHtml,
     };

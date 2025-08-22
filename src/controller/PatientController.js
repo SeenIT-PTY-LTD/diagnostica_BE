@@ -213,65 +213,55 @@ console.log("patient",patient);
 }
 
 async function SendDiagnosticSupportEmail(req, res) {
-    let response;
+  let response;
 
-    try {
-        const { email, subject, content } = req.body;
-        const files = req.files; // multiple files uploaded via multer
+  try {
+    const { email, subject, content } = req.body;
+    const files = req.files; // multiple files uploaded via multer
 
-        if (!email || !subject || !content) {
-            response = Response.sendResponse(
-                false,
-                StatusCodes.BAD_REQUEST,
-                "Email, subject and content are required",
-                {}
-            );
-            return res.status(response.statusCode).send(response);
-        }
-
-        // Image handling (multiple images -> array of URLs)
-        // File handling (images + pdfs -> arrays of URLs)
-        let imageUrls = [];
-        let pdfUrls = [];
-
-        if (files && files.length > 0) {
-            files.forEach((file) => {
-                const fileUrl = `${config.ServerHost}/images/${file.filename}`;
-                if (file.mimetype === "application/pdf") {
-                    pdfUrls.push(fileUrl);
-                } else {
-                    imageUrls.push(fileUrl);
-                }
-            });
-        }
-
-
-        const adminEmail = config.SupportAdminEmail;
-
-        response = await DiagnosticSupportEmail(
-            adminEmail,
-            email,
-            subject,
-            content,
-            imageUrls,
-            pdfUrls
-        );
-
-        if (!response.success) {
-            return res.status(response.statusCode).send(response);
-        }
-
-        // Otherwise return success
-        return res.status(response.statusCode).send(response);
-    } catch (error) {
-        response = Response.sendResponse(
-            false,
-            StatusCodes.INTERNAL_SERVER_ERROR,
-            error.message,
-            {}
-        );
-        return res.status(response.statusCode).send(response);
+    if (!email || !subject || !content) {
+      response = Response.sendResponse(
+        false,
+        StatusCodes.BAD_REQUEST,
+        "Email, subject and content are required",
+        {}
+      );
+      return res.status(response.statusCode).send(response);
     }
+
+    // Image handling (multiple images -> array of URLs)
+    let imageUrls = [];
+    if (files && files.length > 0) {
+      imageUrls = files.map(
+        (file) => `${config.ServerHost}/images/${file.filename}`
+      );
+    }
+
+    const adminEmail = config.SupportAdminEmail;
+
+    response = await DiagnosticSupportEmail(
+      adminEmail,
+      email,
+      subject,
+      content,
+      imageUrls
+    );
+
+    if (!response.success) {
+      return res.status(response.statusCode).send(response);
+    }
+
+    // Otherwise return success
+    return res.status(response.statusCode).send(response);
+  } catch (error) {
+    response = Response.sendResponse(
+      false,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      error.message,
+      {}
+    );
+    return res.status(response.statusCode).send(response);
+  }
 }
 
 async function Login( req ,res ){
