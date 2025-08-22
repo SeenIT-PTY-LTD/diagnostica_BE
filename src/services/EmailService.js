@@ -156,16 +156,24 @@ async function SendEmail( data ) {
 
     try {
 
+      // const transporter = nodemailer.createTransport({
+      //    host: "smtpout.secureserver.net",
+      //    port: 465,
+      //    secure: true,
+      //    auth: {
+      //     user: "info@diagnostica.app", // Ensure correct email
+      //     pass: "Info@Diag@2052", // Ensure correct password or app password
+      //   },
+      // });
+
       const transporter = nodemailer.createTransport({
-         host: "smtpout.secureserver.net",
-         port: 465,
-         secure: true,
-         auth: {
-          user: "info@diagnostica.app", // Ensure correct email
-          pass: "Info@Diag@2052", // Ensure correct password or app password
+        service: "gmail",
+        auth: {
+          user: "kunal.dignizant@gmail.com", // Ensure correct email
+          pass: "whik ogms rqnt zeak", // Ensure correct password or app password
         },
       });
-
+    
       const mailOptions = {
         from: `${data.subject || "Website Enquiry Form"} <support@diagnostica.app>`,
         to: data.to,
