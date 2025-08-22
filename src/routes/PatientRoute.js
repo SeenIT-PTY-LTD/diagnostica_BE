@@ -16,7 +16,21 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|gif|pdf/; // allow pdf as well
+  const extname = allowedTypes.test(
+    path.extname(file.originalname).toLowerCase()
+  );
+  const mimetype = allowedTypes.test(file.mimetype);
+
+  if (mimetype && extname) {
+    return cb(null, true);
+  } else {
+    cb(new Error("Only images and PDF files are allowed!"));
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 
 // registor patient
 Router.post('/registration',decryptReqMiddleware,validate(Validations.RegistrationValidation) , PatientController.Registration);
@@ -27,7 +41,7 @@ Router.get("/verify-email/:token", PatientController.VerifyEmail);
 //support email
 Router.post(
   "/support-email",
-   upload.array("images", 5),
+  upload.array("files", 10), // now "files" can include images + pdfs
   PatientController.SendDiagnosticSupportEmail
 );
 
