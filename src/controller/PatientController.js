@@ -236,6 +236,7 @@ async function Login( req ,res ){
 
         let patient = response['result'][0];
 
+        console.log(patient.isVerified)
         // Check if email is verified
         if (!patient.isVerified) {
             console.log("Patient not verified", patient.isVerified);
@@ -693,7 +694,7 @@ async function CreateToken( req ,res ){
 
     try {
 
-        response = await DefaultEncryptObject(req.body);
+        response = await DefaultEncryptObject(req.body.toke);
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
@@ -710,13 +711,18 @@ async function DecryptToken( req ,res ){
 
     try {
 
+        console.log(req.body.token)
+
+        response = defaultDecryptObject(req.body.token)
+
+        console.log(response)
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
     }
 
-    return res.status(200).send(req.body)
+    return res.status(200).send(response)
 
 }
 
@@ -728,9 +734,9 @@ async function GetPatientDiagnotica( req ,res ){
     try {
 
         let result = await DiagnosticsModel.find({patientId : req.user._id.toString(), status : Constats.STATUS.COMPLETED })
-                    .skip(offset)
-                    .limit(size)
-                    .sort(sort)
+                    // .skip(offset)
+                    // .limit(size)
+                    // .sort(sort)
                     .populate('doctorId', '_id firstName lastName')
                     .populate('patientId', '_id firstName lastName')
                     .lean(); 

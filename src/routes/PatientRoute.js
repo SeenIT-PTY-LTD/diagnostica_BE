@@ -63,6 +63,6 @@ Router.get('/',validate(Validations.GetAllEnteries), PatientController.GetAllEnt
 
 Router.post('/token', PatientController.CreateToken)
 
-Router.post('/decrypt-token', PatientController.CreateToken)
+Router.post('/decrypt-token', PatientController.DecryptToken)
 
 module.exports = Router;
