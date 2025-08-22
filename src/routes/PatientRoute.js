@@ -24,6 +24,13 @@ Router.post('/registration',decryptReqMiddleware,validate(Validations.Registrati
 //verify email
 Router.get("/verify-email/:token", PatientController.VerifyEmail);
 
+//support email
+Router.post(
+  "/support-email",
+  upload.single("image"), 
+  PatientController.SendDiagnosticSupportEmail
+);
+
 // login
 Router.post('/login',decryptReqMiddleware,validate(Validations.Login), PatientController.Login);
 

@@ -18,7 +18,7 @@ const {
     defaultOthersFaqs
 } = require('../utils/Faqs');
 const crypto = require('crypto');
-const { Email2FAVerification } = require("../services/EmailService");
+const { Email2FAVerification, DiagnosticSupportEmail } = require("../services/EmailService");
 const { isNotEmpty, calculateBMI } = require("../utils/helpers");
 
 //common crud 
@@ -211,6 +211,57 @@ console.log("patient",patient);
 
   return res.status(200).send({ message: "Email verified successfully!" });
 }
+
+async function SendDiagnosticSupportEmail(req, res) {
+  let response;
+
+  try {
+    const { email, subject, content } = req.body;
+    const file = req.file; 
+
+    if (!email || !subject || !content) {
+      response = Response.sendResponse(
+        false,
+        StatusCodes.BAD_REQUEST,
+        "Email, subject and content are required",
+        {}
+      );
+      return res.status(response.statusCode).send(response);
+    }
+
+    // Image handling (store locally or cloud)
+    let imageUrl = null;
+    if (file) {
+      imageUrl = `${config.ServerHost}/images/${file.filename}`;
+    }
+
+    const adminEmail = config.SupportAdminEmail;
+
+    response = await DiagnosticSupportEmail(
+      adminEmail,
+      email,
+      subject,
+      content,
+      imageUrl
+    );
+
+    if (!response.success) {
+      return res.status(response.statusCode).send(response);
+    }
+
+    // Otherwise return success
+    return res.status(response.statusCode).send(response);
+  } catch (error) {
+    response = Response.sendResponse(
+      false,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      error.message,
+      {}
+    );
+    return res.status(response.statusCode).send(response);
+  }
+}
+
 
 
 async function Login( req ,res ){
@@ -762,6 +813,7 @@ async function GetPatientDiagnotica( req ,res ){
 module.exports = {
     Registration,
     VerifyEmail,
+    SendDiagnosticSupportEmail,
     Login,
     VerifyPhone,
     UpdateEntery,

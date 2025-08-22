@@ -114,6 +114,42 @@ async function Email2FAVerification(to, verificationUrl, expirationTime) {
   return response;
 }
 
+async function DiagnosticSupportEmail(toAdmin, userEmail, subject, content, imageUrl) {
+  let response;
+  try {
+    const tempPath = process.cwd() + "/src/templates/patient/DiagnosticSupport.hbs";
+    const file = fs.readFileSync(tempPath, "utf8").toString();
+    const template = Handlebars.compile(file);
+
+    const obj = {
+      email: userEmail,
+      subject,
+      content,
+      imageUrl: imageUrl || null,
+    };
+
+    const emailHtml = template(obj);
+    console.log("emailHtml", emailHtml);
+
+    const emailObj = {
+      to: toAdmin, // admin email from config
+      subject: `Diagnostic Support - ${subject}`,
+      html: emailHtml,
+    };
+
+    response = await SendEmail(emailObj);
+  } catch (err) {
+    response = Response.sendResponse(
+      false,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      err.message,
+      {}
+    );
+  }
+
+  return response;
+}
+
 async function SendEmail( data ) {
 
   let response 
@@ -153,6 +189,7 @@ async function SendEmail( data ) {
 module.exports = {
     SendRefferalEmail,
     Email2FAVerification,
+    DiagnosticSupportEmail,
     SendEmail,
     DoctorForgotPasswordEmail
 };
