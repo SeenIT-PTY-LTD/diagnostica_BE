@@ -114,7 +114,7 @@ async function Email2FAVerification(to, verificationUrl, expirationTime) {
   return response;
 }
 
-async function DiagnosticSupportEmail(toAdmin, userEmail, subject, content, imageUrl) {
+async function DiagnosticSupportEmail(toAdmin, userEmail, subject, content, imageUrls) {
   let response;
   try {
     const tempPath = process.cwd() + "/src/templates/patient/DiagnosticSupport.hbs";
@@ -125,7 +125,7 @@ async function DiagnosticSupportEmail(toAdmin, userEmail, subject, content, imag
       email: userEmail,
       subject,
       content,
-      imageUrl: imageUrl || null,
+      imageUrls: imageUrls || [], // pass array
     };
 
     const emailHtml = template(obj);
@@ -150,48 +150,55 @@ async function DiagnosticSupportEmail(toAdmin, userEmail, subject, content, imag
   return response;
 }
 
-async function SendEmail( data ) {
+async function SendEmail(data) {
+  let response;
 
-  let response 
+  try {
 
-    try {
+    // const transporter = nodemailer.createTransport({
+    //    host: "smtpout.secureserver.net",
+    //    port: 465,
+    //    secure: true,
+    //    auth: {
+    //     user: "info@diagnostica.app", // Ensure correct email
+    //     pass: "Info@Diag@2052", // Ensure correct password or app password
+    //   },
+    // });
 
-      // const transporter = nodemailer.createTransport({
-      //    host: "smtpout.secureserver.net",
-      //    port: 465,
-      //    secure: true,
-      //    auth: {
-      //     user: "info@diagnostica.app", // Ensure correct email
-      //     pass: "Info@Diag@2052", // Ensure correct password or app password
-      //   },
-      // });
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "kunal.dignizant@gmail.com", // Gmail
+        pass: "whik ogms rqnt zeak",        // App password
+      },
+    });
 
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: "kunal.dignizant@gmail.com", // Ensure correct email
-          pass: "whik ogms rqnt zeak", // Ensure correct password or app password
-        },
-      });
-    
-      const mailOptions = {
-        from: `${data.subject || "Website Enquiry Form"} <support@diagnostica.app>`,
-        to: data.to,
-        subject: data.subject,
-        html: data.html
-      };
+    const mailOptions = {
+      from: `${data.subject || "Website Enquiry Form"} <kunal.dignizant@gmail.com>`,
+      to: data.to,
+      subject: data.subject,
+      html: data.html,
+    };
 
-      console.log(mailOptions)
-      const info = await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
 
-      response =  Response.sendResponse(true, StatusCodes.OK, "Email Send Successfully", info );
-      
-    } catch (error) {
-      console.error('Error sending email:', error);
-      response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message , {} );
-    }
-    return response
-    
+    response = Response.sendResponse(
+      true,
+      StatusCodes.OK,
+      "Email Send Successfully",
+      info
+    );
+  } catch (error) {
+    console.error("Error sending email:", error);
+    response = Response.sendResponse(
+      false,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      error.message,
+      {}
+    );
+  }
+
+  return response;
 }
 
 module.exports = {

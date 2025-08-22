@@ -27,7 +27,7 @@ Router.get("/verify-email/:token", PatientController.VerifyEmail);
 //support email
 Router.post(
   "/support-email",
-  upload.single("image"), 
+   upload.array("images", 5),
   PatientController.SendDiagnosticSupportEmail
 );
 

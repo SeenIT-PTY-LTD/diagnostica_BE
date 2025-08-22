@@ -25,9 +25,11 @@
       <p><span class="label">Message:</span></p>
       <p>{{content}}</p>
 
-      {{#if imageUrl}}
-      <p><span class="label">Attached Image:</span></p>
-      <img src="{{imageUrl}}" alt="Diagnostic Image" />
+      {{#if imageUrls}}
+        <p><span class="label">Attached Images:</span></p>
+        {{#each imageUrls}}
+          <img src="{{this}}" alt="Diagnostic Image" />
+        {{/each}}
       {{/if}}
     </div>
     <div class="footer">

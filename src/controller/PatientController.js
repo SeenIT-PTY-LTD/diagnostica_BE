@@ -217,7 +217,7 @@ async function SendDiagnosticSupportEmail(req, res) {
 
   try {
     const { email, subject, content } = req.body;
-    const file = req.file; 
+    const files = req.files; // multiple files uploaded via multer
 
     if (!email || !subject || !content) {
       response = Response.sendResponse(
@@ -229,10 +229,12 @@ async function SendDiagnosticSupportEmail(req, res) {
       return res.status(response.statusCode).send(response);
     }
 
-    // Image handling (store locally or cloud)
-    let imageUrl = null;
-    if (file) {
-      imageUrl = `${config.ServerHost}/images/${file.filename}`;
+    // Image handling (multiple images -> array of URLs)
+    let imageUrls = [];
+    if (files && files.length > 0) {
+      imageUrls = files.map(
+        (file) => `${config.ServerHost}/images/${file.filename}`
+      );
     }
 
     const adminEmail = config.SupportAdminEmail;
@@ -242,7 +244,7 @@ async function SendDiagnosticSupportEmail(req, res) {
       email,
       subject,
       content,
-      imageUrl
+      imageUrls
     );
 
     if (!response.success) {
