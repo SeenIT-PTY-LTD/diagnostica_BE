@@ -157,7 +157,6 @@ async function UpdateSubSectionMetadata( req ,res ){
         }
 
     } catch (error) {
-        console.log(error.message,'===================eror')
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
         
     }
@@ -299,7 +298,8 @@ async function AddImageInprompt(req, res) {
         response = await PatientsPromptsCommonCrud.updateEntery(req.body.patientPromptId, data);
 
         if (response.isSuccess) {
-            response = Response.sendResponse(true, StatusCodes.OK, "Image uploaded successfully", {});
+            response = await PatientsPromptsCommonCrud.getSingleEntery( req.body.patientPromptId  )
+            // response = Response.sendResponse(true, StatusCodes.OK, "Image uploaded successfully", {});
         }
 
     } catch (error) {

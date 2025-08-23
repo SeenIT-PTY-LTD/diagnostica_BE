@@ -745,7 +745,7 @@ async function CreateToken( req ,res ){
 
     try {
 
-        response = await DefaultEncryptObject(req.body.toke);
+        response = await DefaultEncryptObject(req.body);
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
