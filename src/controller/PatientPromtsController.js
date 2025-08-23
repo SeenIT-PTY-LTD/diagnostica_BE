@@ -259,7 +259,8 @@ async function AddImageInprompt(req, res) {
         response = await PatientsPromptsCommonCrud.getSingleEntery(req.body.patientPromptId);
 
         if (!response?.result?.[0]) {
-            return res.status(404).send(Response.sendResponse(false, 404, "Patient prompt not found", {}));
+            response = Response.sendResponse(false, StatusCodes.NOT_FOUND, "Patient prompt not found", {});
+            return res.status(response.statusCode).send(resBody)
         }
 
         let data = JSON.parse(JSON.stringify(response.result[0]));
@@ -305,7 +306,9 @@ async function AddImageInprompt(req, res) {
     } catch (error) {
         response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
     }
-    return res.status(response.statusCode).send(response);
+
+    let resBody = await DefaultEncryptObject(response)
+    return res.status(response.statusCode).send(resBody)
 }
 
 async function GetPromtsByBodypart(req,res){
