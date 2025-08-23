@@ -260,6 +260,7 @@ async function AddImageInprompt(req, res) {
 
         if (!response?.result?.[0]) {
             response = Response.sendResponse(false, StatusCodes.NOT_FOUND, "Patient prompt not found", {});
+            let resBody = await DefaultEncryptObject(response)
             return res.status(response.statusCode).send(resBody)
         }
 
