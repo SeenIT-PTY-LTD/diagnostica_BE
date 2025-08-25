@@ -81,8 +81,8 @@ async function UpdateSubSectionMetadata( req ,res ){
 
         let { sectionId , sectionData ,patientPromptId } = req.body;
 
-        
         const userAttenptedSectionResponse = await PatientsPromptsCommonCrud.getSingleEntery(patientPromptId);
+
 
         if(!userAttenptedSectionResponse.isSuccess){
             let resBody = await DefaultEncryptObject(userAttenptedSectionResponse)
@@ -297,12 +297,65 @@ async function AddImageInprompt(req, res) {
             }
         });
 
-        response = await PatientsPromptsCommonCrud.updateEntery(req.body.patientPromptId, data);
+        
+        // response = await PatientsPromptsCommonCrud.updateEntery(req.body.patientPromptId, data);
 
-        if (response.isSuccess) {
-            response = await PatientsPromptsCommonCrud.getSingleEntery( req.body.patientPromptId  )
+        // if (response.isSuccess) {
+
+            let totalSectionCount = 0;
+            let completedSectionCount = 0;
+            data.sections.forEach((section) =>{
+
+                totalSectionCount++;
+
+                if(section['status'] == Constats.STATUS.COMPLETED ){
+                    completedSectionCount++
+                }
+            })
+
+            let appointmentRefId
+
+            if(totalSectionCount == completedSectionCount){
+
+                data['status'] = Constats.STATUS.COMPLETED;
+
+                response = await BodyPartCommonCrud.getSingleEntery(data['bodyPartId'])
+
+                console.log(response,'****response')
+
+                let appointmentId = response.result[0]['name'].split(' ').map((word) => word.charAt(0).toUpperCase()).join('')
+
+                const appoinmentResponse = await AppointmentCommonCrud.getCount({ bodyPartId : data['bodyPartId'] });
+                let count = appoinmentResponse.result.count + 1
+
+                appointmentId = appointmentId + "-" + count;
+
+                let createAppoinmentData = {};
+                createAppoinmentData['bodyPartId'] = data['bodyPartId'] ;
+                createAppoinmentData['appointmentId'] = appointmentId;
+                createAppoinmentData['patientId'] = data['patientId'];
+                createAppoinmentData['patientPromtIds'] = [ req.body.patientPromptId ]
+                
+                if(!data['appointmentRefId']){
+                    response = await AppointmentCommonCrud.creatEntery(createAppoinmentData)
+                    appointmentRefId = response.result['_id'].toString()
+                }
+            
+            }
+
+            data['completedSections'] = completedSectionCount
+
+            if(appointmentRefId){
+                data['appointmentRefId'] = appointmentRefId
+            }
+
+            response = await PatientsPromptsCommonCrud.updateEntery( req.body.patientPromptId , data )
+            if(response.isSuccess){
+                response = await PatientsPromptsCommonCrud.getSingleEntery( req.body.patientPromptId  )
+                
+            }
             // response = Response.sendResponse(true, StatusCodes.OK, "Image uploaded successfully", {});
-        }
+        // }
 
     } catch (error) {
         response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, error.message, {});
