@@ -39,10 +39,10 @@ async function CreateEntery( req ,res ){
         response = await UserCommanCrud.creatEntery(req.body);
 
 
-        if(response.isSuccess){
-            let encrypt = await encryptObject( req.body , config.CryptoSecretKey )
-            response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , { token : encrypt } )
-        }
+        // if(response.isSuccess){
+            // let encrypt = await encryptObject( req.body , config.CryptoSecretKey )
+            // response = Response.sendResponse( true, StatusCodes.OK , CustumMessages.SUCCESS , {  } )
+        // }
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
