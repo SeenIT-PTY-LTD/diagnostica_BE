@@ -7,6 +7,11 @@ const schema = new Schema({
         required : true,
         uniq : true
     },
+    altName : {
+        type : String,
+        uniq : true,
+        default: ""
+    },
     bodyPartId : {
         type: Schema.Types.ObjectId,
         ref: 'bodyParts',
