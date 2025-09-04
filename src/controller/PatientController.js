@@ -100,6 +100,97 @@ let patientFilds = [
 
 // }
 
+// async function Registration(req, res) {
+//   let response;
+
+//   try {
+//     // Check Email duplicates
+//     const checkEmail = await PatientCommonCrud.getEnteryBasedOnCondition({
+//       email: req.body.email,
+//       isActive: true,
+//     });
+
+//     if (checkEmail.isSuccess && checkEmail.result.length) {
+//       response = Response.sendResponse(
+//         false,
+//         StatusCodes.NOT_ACCEPTABLE,
+//         "Email is already present",
+//         {}
+//       );
+//       return res.status(response.statusCode).send(response);
+//     }
+
+//     // Check Phone duplicates
+//     const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({
+//       phone: req.body.phone,
+//       countryCode: req.body.countryCode,
+//       isActive: true,
+//     });
+
+//     if (checkPhone.isSuccess && checkPhone.result.length) {
+//       response = Response.sendResponse(
+//         false,
+//         StatusCodes.NOT_ACCEPTABLE,
+//         "Phone is already present",
+//         {}
+//       );
+//       return res.status(response.statusCode).send(response);
+//     }
+
+//     // Defaults
+//     req.body.medicationsFaqs = req.body.medicationsFaqs || defaultMedicationsFaqs;
+//     req.body.mriSafetyFaqs = req.body.mriSafetyFaqs || defaultMriSafetyFaqs;
+//     req.body.surgicalFaqs = req.body.surgicalFaqs || defaultSurgicalFaqs;
+//     req.body.medicalFaqs = req.body.medicalFaqs || defaultMedicalFaqs;
+//     req.body.othersFaqs = req.body.othersFaqs || defaultOthersFaqs;
+
+//     if( isNotEmpty(req.body.height) && isNotEmpty(req.body.weight)){
+//         req.body.bmi = (calculateBMI( req.body.weight , req.body.height ))['category']
+//     }
+
+//     // Encrypt password & generate keys
+//     req.body.password = await Encryption.encrypt(req.body.password);
+//     req.body.secretKey = await Encryption.randomKey();
+
+//     // Generate verification token
+//     const token = crypto.randomBytes(32).toString("hex");
+//     req.body.verificationToken = token;
+//     req.body.verificationExpires = Date.now() + 15 * 60 * 1000; // valid 15 min
+
+//     // Create patient entry
+//     response = await PatientCommonCrud.creatEntery(req.body);
+
+//     if (response.isSuccess) {
+//       // Build verification URL (frontend link or API link)
+//       const verificationUrl = `${config?.ClientHost}/verify/${token}`;
+
+//       // Send verification email using reusable Email2FAVerification
+//       await Email2FAVerification(
+//         req.body.email,
+//         verificationUrl,
+//         15 // expiration time in minutes
+//       );
+
+//       response = Response.sendResponse(
+//         true,
+//         StatusCodes.OK,
+//         "Patient registered successfully. Please verify your email.",
+//         {}
+//       );
+//     }
+
+//     return res.status(response.statusCode).send(response);
+//   } catch (error) {
+//     response = Response.sendResponse(
+//       false,
+//       StatusCodes.INTERNAL_SERVER_ERROR,
+//       error.message,
+//       {}
+//     );
+//     return res.status(response.statusCode).send(response);
+//   }
+// }
+
 async function Registration(req, res) {
   let response;
 
@@ -117,7 +208,8 @@ async function Registration(req, res) {
         "Email is already present",
         {}
       );
-      return res.status(response.statusCode).send(response);
+      const resBody = await DefaultEncryptObject(response);
+      return res.status(response.statusCode).send(resBody);
     }
 
     // Check Phone duplicates
@@ -134,7 +226,8 @@ async function Registration(req, res) {
         "Phone is already present",
         {}
       );
-      return res.status(response.statusCode).send(response);
+      const resBody = await DefaultEncryptObject(response);
+      return res.status(response.statusCode).send(resBody);
     }
 
     // Defaults
@@ -144,8 +237,8 @@ async function Registration(req, res) {
     req.body.medicalFaqs = req.body.medicalFaqs || defaultMedicalFaqs;
     req.body.othersFaqs = req.body.othersFaqs || defaultOthersFaqs;
 
-    if( isNotEmpty(req.body.height) && isNotEmpty(req.body.weight)){
-        req.body.bmi = (calculateBMI( req.body.weight , req.body.height ))['category']
+    if (isNotEmpty(req.body.height) && isNotEmpty(req.body.weight)) {
+      req.body.bmi = calculateBMI(req.body.weight, req.body.height)["category"];
     }
 
     // Encrypt password & generate keys
@@ -179,7 +272,9 @@ async function Registration(req, res) {
       );
     }
 
-    return res.status(response.statusCode).send(response);
+    const resBody = await DefaultEncryptObject(response);
+    return res.status(response.statusCode).send(resBody);
+
   } catch (error) {
     response = Response.sendResponse(
       false,
@@ -187,7 +282,8 @@ async function Registration(req, res) {
       error.message,
       {}
     );
-    return res.status(response.statusCode).send(response);
+    const resBody = await DefaultEncryptObject(response);
+    return res.status(response.statusCode).send(resBody);
   }
 }
 
