@@ -32,7 +32,9 @@ Router.post(
 );
 
 // login
-Router.post('/login',decryptReqMiddleware,validate(Validations.Login), PatientController.Login);
+// Router.post('/login',decryptReqMiddleware,validate(Validations.Login), PatientController.Login);
+Router.post('/login',validate(Validations.Login), PatientController.Login);
+
 
 // login
 Router.get('/get-patient-detail', PatientController.GetPatientDeatils);

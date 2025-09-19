@@ -20,6 +20,7 @@ const {
 const crypto = require('crypto');
 const { Email2FAVerification, DiagnosticSupportEmail } = require("../services/EmailService");
 const { isNotEmpty, calculateBMI } = require("../utils/helpers");
+const SmsVerifyService = require("../services/SmsVerifyService"); // adjust path
 
 //common crud 
 const PatientCommonCrud = new CommonCrud(PatientModel)
@@ -48,148 +49,6 @@ let patientFilds = [
     "postcode"
 ]
 
-
-// async function Registration( req ,res ){
-
-//     let response
-
-//     try {
-
-//         const checkEmail = await PatientCommonCrud.getEnteryBasedOnCondition({ email: req.body.email, isActive : true })
-
-//         if(checkEmail['isSuccess'] && checkEmail['result'].length){
-//             response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Email is alrady present" , {} )
-//             let resBody = await DefaultEncryptObject( response )
-//             return res.status(response.statusCode).send(resBody)
-//         }
-//         const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({ phone : req.body.phone , countryCode : req.body.countryCode, isActive : true  })
-
-//         if(checkPhone ['isSuccess'] && checkPhone['result'].length){
-//             response = Response.sendResponse( false, StatusCodes.NOT_ACCEPTABLE , "Phone is alrady present" , {} )
-//             let resBody = await DefaultEncryptObject( response )
-//             return res.status(response.statusCode).send(resBody)
-//         }
-
-        
-//         // Set defaults if missing
-//         req.body.medicationsFaqs = req.body.medicationsFaqs || defaultMedicationsFaqs;
-//         req.body.mriSafetyFaqs = req.body.mriSafetyFaqs || defaultMriSafetyFaqs;
-//         req.body.surgicalFaqs = req.body.surgicalFaqs || defaultSurgicalFaqs;
-//         req.body.medicalFaqs = req.body.medicalFaqs || defaultMedicalFaqs;
-//         req.body.othersFaqs = req.body.othersFaqs || defaultOthersFaqs;
-
-//         // Encrypt password & set secret key
-//         req.body.password = await Encryption.encrypt(req.body.password);
-//         req.body.secretKey = await Encryption.randomKey()
-//         response = await PatientCommonCrud.creatEntery(req.body);
-
-//         if(response.isSuccess){
-//             response = Response.sendResponse( true, StatusCodes.OK , "patient registration sucessfully" , {} )
-//         }
-
-//         let resBody = await DefaultEncryptObject( response )
-//         return res.status(response.statusCode).send(resBody)
-
-//     } catch (error) {
-    
-//         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
-
-//     }
-
-//     return res.status(response.statusCode).send(response)
-
-// }
-
-// async function Registration(req, res) {
-//   let response;
-
-//   try {
-//     // Check Email duplicates
-//     const checkEmail = await PatientCommonCrud.getEnteryBasedOnCondition({
-//       email: req.body.email,
-//       isActive: true,
-//     });
-
-//     if (checkEmail.isSuccess && checkEmail.result.length) {
-//       response = Response.sendResponse(
-//         false,
-//         StatusCodes.NOT_ACCEPTABLE,
-//         "Email is already present",
-//         {}
-//       );
-//       return res.status(response.statusCode).send(response);
-//     }
-
-//     // Check Phone duplicates
-//     const checkPhone = await PatientCommonCrud.getEnteryBasedOnCondition({
-//       phone: req.body.phone,
-//       countryCode: req.body.countryCode,
-//       isActive: true,
-//     });
-
-//     if (checkPhone.isSuccess && checkPhone.result.length) {
-//       response = Response.sendResponse(
-//         false,
-//         StatusCodes.NOT_ACCEPTABLE,
-//         "Phone is already present",
-//         {}
-//       );
-//       return res.status(response.statusCode).send(response);
-//     }
-
-//     // Defaults
-//     req.body.medicationsFaqs = req.body.medicationsFaqs || defaultMedicationsFaqs;
-//     req.body.mriSafetyFaqs = req.body.mriSafetyFaqs || defaultMriSafetyFaqs;
-//     req.body.surgicalFaqs = req.body.surgicalFaqs || defaultSurgicalFaqs;
-//     req.body.medicalFaqs = req.body.medicalFaqs || defaultMedicalFaqs;
-//     req.body.othersFaqs = req.body.othersFaqs || defaultOthersFaqs;
-
-//     if( isNotEmpty(req.body.height) && isNotEmpty(req.body.weight)){
-//         req.body.bmi = (calculateBMI( req.body.weight , req.body.height ))['category']
-//     }
-
-//     // Encrypt password & generate keys
-//     req.body.password = await Encryption.encrypt(req.body.password);
-//     req.body.secretKey = await Encryption.randomKey();
-
-//     // Generate verification token
-//     const token = crypto.randomBytes(32).toString("hex");
-//     req.body.verificationToken = token;
-//     req.body.verificationExpires = Date.now() + 15 * 60 * 1000; // valid 15 min
-
-//     // Create patient entry
-//     response = await PatientCommonCrud.creatEntery(req.body);
-
-//     if (response.isSuccess) {
-//       // Build verification URL (frontend link or API link)
-//       const verificationUrl = `${config?.ClientHost}/verify/${token}`;
-
-//       // Send verification email using reusable Email2FAVerification
-//       await Email2FAVerification(
-//         req.body.email,
-//         verificationUrl,
-//         15 // expiration time in minutes
-//       );
-
-//       response = Response.sendResponse(
-//         true,
-//         StatusCodes.OK,
-//         "Patient registered successfully. Please verify your email.",
-//         {}
-//       );
-//     }
-
-//     return res.status(response.statusCode).send(response);
-//   } catch (error) {
-//     response = Response.sendResponse(
-//       false,
-//       StatusCodes.INTERNAL_SERVER_ERROR,
-//       error.message,
-//       {}
-//     );
-//     return res.status(response.statusCode).send(response);
-//   }
-// }
 
 async function Registration(req, res) {
   let response;
@@ -360,82 +219,105 @@ async function SendDiagnosticSupportEmail(req, res) {
   }
 }
 
-async function Login( req ,res ){
+async function Login(req, res) {
+  let response;
 
-    let response
+  try {
+    const { email, password } = req.body;
 
-    try {
+    response = await PatientCommonCrud.getEnteryBasedOnCondition({
+      email: email,
+      isActive: true,
+    });
 
-        const { email , password } = req.body;
-
-        response = await PatientCommonCrud.getEnteryBasedOnCondition({ email : email , isActive : true  });
-
-        if( !response['isSuccess'] ){
-            let resBody = await DefaultEncryptObject(response)
-            return res.status(response.statusCode).send(resBody)
-        }
-
-        if( response['isSuccess'] && !response['result'].length ){
-            response = Response.sendResponse(false,StatusCodes.UNAUTHORIZED, CustumMessages.USER_NOT_Present, {})
-            let resBody = await DefaultEncryptObject(response)
-            return res.status(response.statusCode).send(resBody)
-        }
-
-        let patient = response['result'][0];
-
-        console.log(patient.isVerified)
-        // Check if email is verified
-        if (!patient.isVerified) {
-            console.log("Patient not verified", patient.isVerified);
-            response = Response.sendResponse(
-                false,
-                StatusCodes.UNAUTHORIZED,
-                "Please verify your email before logging in.",
-                {}
-            );
-
-            let resBody = await DefaultEncryptObject(response)
-            return res.status(response.statusCode).send(resBody);
-        }
-
-        let compare = await Encryption.compare(  password, patient['password']  )
-
-        if( compare['status']){
-
-            let secretKey = await Encryption.randomKey()
-
-            response = await PatientCommonCrud.updateEntery( patient._id.toString() ,{ secretKey : secretKey })
-
-            const token = await JWT.createToken({ id : patient._id , role : "patient" , secretKey : secretKey })
-
-            if(token['status']){
-
-                response = Response.sendResponse( true, StatusCodes.OK, CustumMessages.SUCCESS, {  
-                    authToken : token['result'],
-                    phone : patient.phone,
-                    countryCode : patient.countryCode
-                } )
-                let resBody = await DefaultEncryptObject(response)
-                return res.status(StatusCodes.OK).send(resBody)
-
-            }else{
-                
-                response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR, token['error'], {  })
-                let resBody = await DefaultEncryptObject(response)
-                return res.status(response.statusCode).send(resBody)
-            }
-        }
-
-        response = Response.sendResponse(false,StatusCodes.UNAUTHORIZED, CustumMessages.INCORRECT_CREDENTIALS, {  })
-        let resBody = await DefaultEncryptObject(response)
-        return res.status(response.statusCode).send(resBody)
-
-    } catch (error) {
-        response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
-        let resBody = await DefaultEncryptObject(response)
-        return res.status(response.statusCode).send(resBody)
+    if (!response.isSuccess) {
+      return res.status(response.statusCode).json(response);
     }
 
+    if (response.isSuccess && !response.result.length) {
+      response = Response.sendResponse(
+        false,
+        StatusCodes.UNAUTHORIZED,
+        CustumMessages.USER_NOT_Present,
+        {}
+      );
+      return res.status(StatusCodes.UNAUTHORIZED).json(response);
+    }
+
+    let patient = response.result[0];
+
+    // Check if email is verified
+    if (!patient.isVerified) {
+      response = Response.sendResponse(
+        false,
+        StatusCodes.UNAUTHORIZED,
+        "Please verify your email before logging in.",
+        {}
+      );
+      return res.status(StatusCodes.UNAUTHORIZED).json(response);
+    }
+
+    // Check password
+    let compare = await Encryption.compare(password, patient.password);
+
+    if (compare.status) {
+      // ✅ Generate OTP (still store it locally if you want)
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+      await PatientCommonCrud.updateEntery(patient._id.toString(), {
+        otpCode: otp,
+        otpExpires: expiry,
+      });
+
+      // ✅ Send OTP via Twilio Verify Service
+      const smsResponse = await SmsVerifyService.sendVerification(
+        patient.countryCode + patient.phone
+      );
+
+      if (!smsResponse.success) {
+        response = Response.sendResponse(
+          false,
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          smsResponse.error,
+          {}
+        );
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+      }
+
+      // ✅ Respond with success (no JWT yet, wait for OTP verification)
+      response = Response.sendResponse(
+        true,
+        StatusCodes.OK,
+        "OTP sent to registered mobile",
+        {
+          userId: patient._id, // needed in VerifyOtp
+          phone: patient.phone,
+          countryCode: patient.countryCode,
+        }
+      );
+      return res.status(StatusCodes.OK).json(response);
+    }
+
+    // Incorrect password
+    response = Response.sendResponse(
+      false,
+      StatusCodes.UNAUTHORIZED,
+      CustumMessages.INCORRECT_CREDENTIALS,
+      {}
+    );
+    return res.status(StatusCodes.UNAUTHORIZED).json(response);
+  } catch (error) {
+    console.error("❌ [Login] Error:", error);
+
+    response = Response.sendResponse(
+      false,
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      error.message,
+      {}
+    );
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+  }
 }
 
 async function GetPatientDeatils( req ,res ){
