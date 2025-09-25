@@ -626,7 +626,7 @@ async function getPatientPromptByBodyPart(req, res) {
             status : Constats.STATUS.COMPLETED
         }
 
-        const patientPromptByLimit = await PatientsPromptsCommonCrud.getAllEnteries( condition );
+        const patientPromptByLimit = await PatientsPromptsCommonCrud.getAllEnteries({}, condition );
 
         if(patientPromptByLimit.result.list.length == 0){
             response = Response.sendResponse(true, StatusCodes.OK, "Patient prompt fetched successfully", []);
