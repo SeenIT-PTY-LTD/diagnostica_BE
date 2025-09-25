@@ -205,6 +205,15 @@ const ResetPassword = {
   }),
 };
 
+
+const VerifyOtp = {
+  body: Joi.object({
+    phone: Joi.string().required(),
+    countryCode: Joi.string().required(),
+    code: Joi.string()
+  }),
+};
+
 module.exports = {
   RegistrationValidation,
   Login,
@@ -215,4 +224,5 @@ module.exports = {
   idParamsModel,
   GetAllEnteries,
   ResetPassword,
+  VerifyOtp
 };
