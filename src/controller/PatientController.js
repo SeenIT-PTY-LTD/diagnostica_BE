@@ -25,6 +25,7 @@ const { isNotEmpty, calculateBMI } = require("../utils/helpers");
 const PatientCommonCrud = new CommonCrud(PatientModel)
 const PatientPromptsCrud = new CommonCrud(PatientPromptsModel)
 const DiagnosticsCommonCrud = new CommonCrud(DiagnosticsModel)
+const SmsService = require("../services/SmsService");
 
 let patientFilds = [ 
     'firstName',
@@ -906,6 +907,51 @@ async function GetPatientDiagnotica( req ,res ){
 
 }
 
+
+
+async function VerifyOtp(req, res) {
+let response;
+
+try {
+
+    const { countryCode, phone , code } = req.body;
+
+    const to = "+"+ countryCode + phone;
+    if(code){
+
+        const verifyResponse = await SmsService.checkVerification( to, code);
+
+        console.log("checkVerification response:", verifyResponse);
+
+        if(verifyResponse.success && verifyResponse.status == "approved"){
+          response = Response.sendResponse(true, StatusCodes.OK, "OTP verified successfully", {});
+        }else{
+          response = Response.sendResponse(false, StatusCodes.UNAUTHORIZED, "Invalid OTP", {});
+        }
+    }else{
+
+        response = await SmsService.sendVerification(to);
+
+        console.log("sendVerification response:", response);
+
+        if(response.success){
+          response = Response.sendResponse(true, StatusCodes.OK, "OTP sent successfully", {});
+        }else{
+          response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, "Failed to send OTP", {});
+        }
+
+    }
+
+    } catch (error) {
+
+    console.error("❌ [VerifyOtp] Error:", error);
+    response = Response.sendResponse(false, StatusCodes.INTERNAL_SERVER_ERROR, CustumMessages.INTERNAL_SERVER_ERROR, {});
+    }
+
+    let resBody = await DefaultEncryptObject(response)
+    return res.status(response.statusCode).send(resBody)
+}
+
 module.exports = {
     Registration,
     VerifyEmail,
@@ -925,5 +971,6 @@ module.exports = {
     ResetPasswordWithToken,
     CreateToken,
     DecryptToken,
-    GetPatientDiagnotica
+    GetPatientDiagnotica,
+    VerifyOtp
 }
