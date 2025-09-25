@@ -210,7 +210,7 @@ const VerifyOtp = {
   body: Joi.object({
     phone: Joi.string().required(),
     countryCode: Joi.string().required(),
-    code: Joi.string()
+    code: Joi.string().allow("", null)
   }),
 };
 

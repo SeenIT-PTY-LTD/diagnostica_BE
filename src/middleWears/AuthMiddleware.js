@@ -24,6 +24,7 @@ const AuthMiddleware = async (req, res, next) => {
     { method: "PUT", path: "/user/reset-password" },
     { method: "PUT", path: "/patient/reset-password" },
     { method: "POST", path: "/patient/token" },
+    { method: "POST", path: "/patient/verify-otp" },
   ];
 
   // ✅ First: allow verify-email/:token

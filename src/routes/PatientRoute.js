@@ -52,7 +52,7 @@ Router.put('/update-profile-image', upload.single('image'), PatientController.Up
 // reset password with token
 Router.put('/reset-password', decryptReqMiddleware , validate(Validations.ResetPassword), PatientController.ResetPasswordWithToken )
 
-Router.post('/verify-otp',decryptReqMiddleware, validate(Validations.VerifyOtp), PatientController.VerifyOtp)
+Router.post('/verify-otp', validate(Validations.VerifyOtp), PatientController.VerifyOtp)
 
 // update patient by id
 Router.put('/',decryptReqMiddleware,validate(Validations.Update), PatientController.UpdateEntery);
