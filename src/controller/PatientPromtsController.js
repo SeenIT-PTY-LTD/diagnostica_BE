@@ -609,7 +609,7 @@ async function getPatientPromptByBodyPart(req, res) {
     let response;
 
     try {
-        const patientId = req.user._id.toString(); 
+        const patientId = req.user._id.toString();
         
         const { bodyPartId } = req.query; 
 
@@ -626,7 +626,27 @@ async function getPatientPromptByBodyPart(req, res) {
             status : Constats.STATUS.COMPLETED
         }
 
-        const data = await PatientsPromptsCommonCrud.getEnteryBasedOnCondition( condition )
+        const patientPromptByLimit = await PatientsPromptsCommonCrud.getAllEnteries( condition );
+
+        if(patientPromptByLimit.result.list.length == 0){
+            response = Response.sendResponse(true, StatusCodes.OK, "Patient prompt fetched successfully", []);
+            let resBody = await DefaultEncryptObject(response)
+            return res.status(StatusCodes.OK).send(resBody);
+        }
+
+        const appoinmentIds = patientPromptByLimit.result.list.map(prompt => prompt.appointmentRefId.toString());
+
+        const appoinmentResponse = await AppointmentCommonCrud.getEnteryBasedOnCondition( { _id: { $in: appoinmentIds } });
+
+        let promIds = [];
+
+        appoinmentResponse.result.forEach(app => {
+
+            promIds = [...promIds, ...app.patientPromtIds ]
+        })
+
+        const data = await PatientsPromptsCommonCrud.getEnteryBasedOnCondition(  { _id: { $in: promIds } } );
+
         response = Response.sendResponse(true, StatusCodes.OK, "Patient prompt fetched successfully", data.result || []);
 
     } catch (error) {
