@@ -182,6 +182,10 @@ const schema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    isTrial : {
+      type : Boolean,
+      default : false
+  }
   },
   { timestamps: true }
 );

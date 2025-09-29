@@ -19,7 +19,8 @@ const QuestionRoute = require('./src/routes/QuestionRoute.js')
 const PatientsPromptRoute = require('./src/routes/PatientPromtsRoute.js')
 const DiagnosticsRoute = require('./src/routes/DiagnosticsRoute.js')
 const appointmentRoute = require('./src/routes/AppoinmentRoute.js')
-
+const SurveyRoute = require('./src/routes/SurveyRoute.js');
+const HospitalRoute = require('./src/routes/HospitalRoute.js')
 const path = require('path');
 const UserRouter = require("./src/routes/UserRoute.js");
 
@@ -56,6 +57,8 @@ app.use('/question', QuestionRoute)
 app.use('/prompt',PatientsPromptRoute)
 app.use('/diagnostics',DiagnosticsRoute)
 app.use('/appointment',appointmentRoute)
+app.use('/survey', SurveyRoute);
+app.use('/hospital', HospitalRoute)
 
 const PORT = config.express.port;
 // listen
