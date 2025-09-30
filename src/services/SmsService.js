@@ -11,7 +11,7 @@ const SmsService = {
     sendMessage: async (to) => {
 
         try {
-            const message = await client.verify.v2.services("VAc12f7b5889a414fe29c8d8f114547efb")
+            const message = await client.verify.v2.services(serviceSid)
             .verifications.
             create({ to: to, channel: "sms" })
             return { success: true, sid: message.sid, status: message.status };
@@ -26,7 +26,7 @@ const SmsService = {
     sendVerification: async (to) => {
 
         try {
-            const message = await client.verify.v2.services("VAc12f7b5889a414fe29c8d8f114547efb")
+            const message = await client.verify.v2.services(serviceSid)
             .verifications.
             create({ to: to, channel: "sms" })
             return { success: true, sid: message.sid, status: message.status };
