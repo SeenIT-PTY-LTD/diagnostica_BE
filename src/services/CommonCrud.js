@@ -137,6 +137,95 @@ class CommonCrud{
         }
     };
 
+
+    // Read documents
+    getAllSurveyEnteries = async ( query , queryWhereCondition = {} ) => {
+        try {
+    
+            let size = 10;
+            let offset = 0;
+            let page = 0;
+
+            size = query['size'] ? parseInt(query['size']) : 10;
+            page = query['page'] ? parseInt(query['page'] - 1) : 0;
+            offset = size * page;
+
+            let sort = {}
+            
+            if (query['sort'])
+                sort = JSON.parse(query['sort'])
+            else
+                sort['createdAt'] = -1
+
+           
+            let filters = query['filters']
+
+            if (filters != undefined) {
+        
+                filters = JSON.parse(filters);
+                let filterKeys = Object.keys(filters);
+
+                for (let x = 0; x < filterKeys.length; x++) {
+
+                    if(filters[filterKeys[x]] instanceof Array){
+
+                        if(filterKeys[x] == "id"){
+                            queryWhereCondition["_id"] = {"$in": filters[filterKeys[x]]};
+                        }else{
+                            queryWhereCondition[filterKeys[x]] = {"$in": filters[filterKeys[x]]};
+                        }
+
+                    }else{
+
+                        if( filterKeys[x] == "id" ){
+                            queryWhereCondition["_id"] = filters[filterKeys[x]];
+                        }else{
+                            queryWhereCondition[filterKeys[x]] = filters[filterKeys[x]];
+                        }
+                    }
+
+                }
+            }   
+
+
+            if( query.searchCriteria &&query.search  ){
+         
+                queryWhereCondition[query.searchCriteria] = {
+                        '$regex': `^${query.search}`, "$options": "si"
+                }
+            
+            }
+
+            if( query.search && !query.searchCriteria ){
+
+                queryWhereCondition['$or'] = [
+                    {
+                       name : new RegExp(query.search,"i")
+                    },
+                    {
+                       medicareNumber : new RegExp(query.search,'i')
+                    },
+                    {
+                        surveyRefId : new RegExp(query.search,'i')
+                    }
+                ]
+            }
+            
+            let result = await this.Model.find(queryWhereCondition).skip(offset).limit(size).sort(sort);            
+            let resultLength = await this.Model.find(queryWhereCondition).countDocuments()
+
+            let obj = {}
+            obj['list'] = result;
+            obj['count'] = resultLength;
+
+            return Response.sendResponse( true ,StatusCodes.OK , CustumMessages.SUCCESS , obj  )
+    
+        } catch (error) {
+            
+            return Response.sendResponse( false , StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
+        }
+    };
+
     getAllEnteriesWithoutLimit = async ( query , queryWhereCondition = {} ) => {
         try {
 

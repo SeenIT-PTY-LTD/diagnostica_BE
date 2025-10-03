@@ -12,7 +12,7 @@ var schema = new Schema({
     },
     monthYear : {
         type : String,
-        required : true
+        // required : true
     },
     surveyForm : { 
         type : {},
@@ -27,9 +27,26 @@ var schema = new Schema({
     },
     type : {
         type : String,
-        required : true
+        // required : true
+    },
+    date : {
+        type : String
+    },
+    hospitalFacility : {
+        type : String
+    },
+    medovexRepresentative : {
+        type : String
+    },
+    poNumber : {
+        type : String
+    },
+    surgen : {
+        type : String
+    },
+    patientId : {
+        type : String
     }
-
 }, { timestamps  : true });
 
 

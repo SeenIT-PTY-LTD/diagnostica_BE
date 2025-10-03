@@ -17,7 +17,7 @@ async function CreateSurvey( req ,res ){
 
         let surveyNumber = 1;
 
-        const surveys = await surveyCommonCrud.getEnteryBasedOnCondition( { medicareNumber : req.body.medicareNumber });
+        const surveys = await surveyCommonCrud.getEnteryBasedOnCondition( {  medicareNumber : req.body.medicareNumber });
         
         if(surveys.result.length){
             surveyNumber = surveys.result.length + 1
@@ -49,11 +49,12 @@ async function GetAllSurvey( req ,res ){
 
         let condition = {};
 
-        if(req.body.type){
-            condition['type'] = req.body.type
+        if(req.query.type){
+            condition['type'] = req.query.type
         }
     
-        response = await surveyCommonCrud.getAllEnteries( condition ,req.query);
+        console.log(condition,'==condition')
+        response = await surveyCommonCrud.getAllSurveyEnteries( req.query , condition );
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )
