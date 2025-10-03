@@ -60,6 +60,9 @@ const Update = {
     medicareNumber: optionalString,
     profileImage: optionalString,
 
+    hospitalId : optionalString,
+    isTrial : Joi.boolean(),
+
     patientDetails: Joi.object({
       medicalCard: optionalString,
       personId: optionalString,

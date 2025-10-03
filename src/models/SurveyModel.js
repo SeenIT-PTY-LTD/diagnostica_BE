@@ -1,51 +1,6 @@
 var mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-
-const surveyFormSchema = new Schema({   
-    additionalComments : {
-        type : String,
-    },
-    complications : {
-        type : String,
-    },
-    complicationsDescription : {
-        type : String,
-    },
-    easeOfShaping : {
-        type : String,
-    },
-    frequencyOfUse : {
-        type : String,
-    },
-    handlingCharacteristics : {
-        type : String,
-    },
-    materials : {
-        type : [String],
-    },
-    osteoconductive : {
-        type : String,
-    },
-    otherProcedure : {
-        type : String,
-    },
-    radiologicalEvidence : {
-        type : String,
-    },
-    recommendation : {
-        type : String,
-    },
-    satisfaction : {
-        type : String,
-    },
-    stability : {
-        type : String,
-    },
-    surgicalProcedures : {
-        type : [String],
-    }
-})
 var schema = new Schema({
     name : {
         type : String,
@@ -60,14 +15,22 @@ var schema = new Schema({
         required : true
     },
     surveyForm : { 
-        type : surveyFormSchema, 
+        type : {},
         required : true 
-    },surveyRefId : {
+    },
+    surveyRefId : {
+        type : String,
+        required : true
+    },
+    skeletonPositions : {
+        type : []
+    },
+    type : {
         type : String,
         required : true
     }
 
-}, { timestamps     : true });
+}, { timestamps  : true });
 
 
 const SurveyModel = new mongoose.model('survey', schema);

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const patientDetailsSchema = new mongoose.Schema({
   medicalCard: { type: String, default: "" },
@@ -181,6 +182,10 @@ const schema = new mongoose.Schema(
     verificationExpires: {
       type: Date,
       default: null,
+    },
+    hospitalId : {
+      type: Schema.Types.ObjectId,
+      ref: 'hospitals',
     },
     isTrial : {
       type : Boolean,

@@ -18,6 +18,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const skeletonStorage = multer.diskStorage({
+  destination: "./src/img/skeleton",
+  filename: (req, file, cb) => {
+ 
+    const ext = path.extname(file.originalname);
+    cb(
+      null,
+      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
+    );
+  },
+});
+
+const uploadSkeleton = multer({ skeletonStorage });
+
 // create hospital with logo upload
 Router.post('/create', upload.single('logo'), HospitalController.CreateHospital);
 
@@ -27,6 +41,8 @@ Router.get('/', HospitalController.GetAllHospitals);
 // get one servey
 Router.get('/:id', HospitalController.GetSingleHospital);
 
-Router.put('/:id', HospitalController.UpdateSingleHospital);
+Router.put('/:id',upload.single('logo'), HospitalController.UpdateSingleHospital);
+
+Router.put('/:id',uploadSkeleton.single('skeleton'), HospitalController.UpdateSingleHospital);
 
 module.exports = Router;

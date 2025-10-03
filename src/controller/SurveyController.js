@@ -46,8 +46,14 @@ async function GetAllSurvey( req ,res ){
     let response
 
     try {
+
+        let condition = {};
+
+        if(req.body.type){
+            condition['type'] = req.body.type
+        }
     
-        response = await surveyCommonCrud.getAllEnteries({},req.query);
+        response = await surveyCommonCrud.getAllEnteries( condition ,req.query);
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )

@@ -19,7 +19,7 @@ async function CreateHospital( req ,res ){
 
         // If logo file is uploaded, add the file path
         if (req.file) {
-            const logoPath = `/ima/hospitals/${req.file.filename}`;
+            const logoPath = `/images/hospitals/${req.file.filename}`;
             hospitalData.logo = logoPath;
         }
 
@@ -74,8 +74,16 @@ async function UpdateSingleHospital( req,res){
     let response
 
     try {
+
+        let hospitalData = { ...req.body };
+
+        // If logo file is uploaded, add the file path
+        if (req.file) {
+            const logoPath = `/images/hospitals/${req.file.filename}`;
+            hospitalData.logo = logoPath;
+        }
     
-        response = await HospitalCommonCrud.updateEntery( req.params.id , req.body );
+        response = await HospitalCommonCrud.updateEntery( req.params.id , hospitalData );
 
     } catch (error) {
         response = Response.sendResponse( false, StatusCodes.INTERNAL_SERVER_ERROR , error.message , {} )

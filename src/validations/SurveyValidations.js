@@ -1,51 +1,28 @@
 const Joi = require('joi');
 
 const createSurveyValidation = {
-    body:  Joi.object({ 
-        name : Joi.string().required(),
-        medicareNumber : Joi.string().required(),
-        monthYear : Joi.string().required(),
-       surveyForm: Joi.object({   
-    additionalComments: Joi.string().optional().allow(''),
-    frequencyOfUse: Joi.string().required(),
-    complications: Joi.string().when('frequencyOfUse', {
-        is: Joi.valid('Never'),
-        then: Joi.optional().allow(''),
-        otherwise: Joi.required().messages({ 'any.required': 'Complications is required' })
-    }),
-    complicationsDescription: Joi.string().optional().allow(''),
-    easeOfShaping: Joi.string().when('frequencyOfUse', {
-        is: 'Never',
-        then: Joi.optional().allow(''),
-        otherwise: Joi.required().messages({ 'any.required': 'Ease of shaping is required' })
-    }),
-    handlingCharacteristics: Joi.string().when('frequencyOfUse', {
-        is: 'Never',
-        then: Joi.optional().allow(''),
-        otherwise: Joi.required().messages({ 'any.required': 'Handling characteristics is required' })
-    }),
-    osteoconductive: Joi.string().when('frequencyOfUse', {
-        is: 'Never',
-        then: Joi.optional().allow(''),
-        otherwise: Joi.required().messages({ 'any.required': 'Osteoconductive is required' })
-    }),
-    radiologicalEvidence: Joi.string().when('frequencyOfUse', {
-        is: 'Never',
-        then: Joi.optional().allow(''),
-        otherwise: Joi.required().messages({ 'any.required': 'Radiological evidence is required' })
-    }),
-    stability: Joi.string().when('frequencyOfUse', {
-        is: 'Never',
-        then: Joi.optional().allow(''),
-        otherwise: Joi.required().messages({ 'any.required': 'Stability is required' })
-    }),
-    materials: Joi.array().items(Joi.string()).optional(),
-    recommendation: Joi.string().required(),
-    satisfaction: Joi.string().required(),
-    surgicalProcedures: Joi.array().items(Joi.string()).optional(),
-    otherProcedure: Joi.string().optional().allow('')
-}).required()
-
+    body: Joi.object({
+        name : Joi.string(),
+        medicareNumber : Joi.string(),
+        monthYear : Joi.string(),
+        type : Joi.string().valid("adbone").required(),
+        surveyForm : Joi.object({   
+            additionalComments : Joi.string().optional().allow(''),
+            complications : Joi.string().optional().allow(''),
+            complicationsDescription : Joi.string().optional().allow(''),
+            easeOfShaping : Joi.string().optional().allow(''),
+            frequencyOfUse : Joi.string().optional().allow(''),
+            handlingCharacteristics : Joi.string().optional().allow(''),
+            materials : Joi.array().items(Joi.string()),
+            osteoconductive : Joi.string().optional().allow(''),
+            otherProcedure : Joi.string().optional().allow('').optional().allow(''),
+            radiologicalEvidence : Joi.string().optional().allow(''),
+            recommendation : Joi.string().optional().allow(''),
+            satisfaction : Joi.string().optional().allow(''),
+            stability : Joi.string().optional().allow(''),
+            surgicalProcedures : Joi.array().items(Joi.string()),
+            skeletonPositions : Joi.array()
+        })
     })
 }
 const GetAllEnteries ={
@@ -54,7 +31,8 @@ const GetAllEnteries ={
         page : Joi.number().optional(),
         limit : Joi.number().optional(),
         sortBy : Joi.string().optional(),
-        sortOrder : Joi.string().valid('asc','desc').optional()
+        sortOrder : Joi.string().valid('asc','desc').optional(),
+        type : Joi.string()
     })
 }
 
